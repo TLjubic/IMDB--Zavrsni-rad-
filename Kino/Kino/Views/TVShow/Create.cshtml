@@ -1,0 +1,81 @@
+﻿@model Kino.Models.Kino.TVShowStarModel
+
+@{
+    ViewData["Title"] = "Create";
+}
+
+<h2>Create</h2>
+
+<h4>TVShow</h4>
+<hr />
+<div class="row">
+    <div class="col-md-4">
+        <form asp-action="Create">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            <div class="form-group">
+                <label asp-for="TVShow.Title" class="control-label"></label>
+                <input asp-for="TVShow.Title" class="form-control" />
+                <span asp-validation-for="TVShow.Title" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="TVShow.ReleaseDate" class="control-label"></label>
+                <input asp-for="TVShow.ReleaseDate" class="form-control" />
+                <span asp-validation-for="TVShow.ReleaseDate" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="TVShow.NumberOfEpisode" class="control-label"></label>
+                <input asp-for="TVShow.NumberOfEpisode" class="form-control" />
+                <span asp-validation-for="TVShow.NumberOfEpisode" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="TVShow.Description" class="control-label"></label>
+                <input asp-for="TVShow.Description" class="form-control" />
+                <span asp-validation-for="TVShow.Description" class="text-danger"></span>
+            </div>
+
+            <div class="form-group">
+                <div class="col-md-offset-2 col-md-10">
+                    <table>
+                        <tr>
+                            @{
+                                int cnt = 0;
+                                List<Kino.Models.Kino.TVShowGenreModel> genres = ViewBag.GenresTVShowNew;
+
+                                foreach (var genre in genres)
+                                {
+                                    if (cnt++ % 3 == 0)
+                                    {
+                                    @:</tr><tr>
+                                    }
+                                    @:<td>
+                                        <input type="checkbox"
+                                               name="selectedGenres"
+                                               value="@genre.GenreId"
+                                               @(Html.Raw(genre.Check ? "checked=\"checked\"" : "")) />
+                                        @genre.GenreId @:  @genre.Title
+                                    @:</td>
+                                }
+                            @:</tr>
+                            }
+
+                        </table>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label class="control-label">Star</label>
+                    <select asp-for="selectedStars" class="select-picker form-control" multiple="multiple"
+                            id="star" placeholder="" asp-items="ViewBag.PossibleStars" SelectionMode="Multiple"></select>
+                </div>
+
+                <div class="form-group">
+                    <input type="submit" value="Create" class="btn btn-default" />
+                </div>
+            </form>
+    </div>
+</div>
+
+<div>
+    <a asp-action="Index">Back to List</a>
+</div>
+

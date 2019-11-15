@@ -1,0 +1,48 @@
+﻿@model IEnumerable<Model.Star>
+
+@{
+    ViewData["Title"] = "Stars";
+}
+
+<h2>Stars</h2>
+
+<p>
+    <a asp-action="Create">Create New</a>
+</p>
+<table class="table">
+    <thead>
+        <tr>
+            <th>
+                @Html.DisplayNameFor(model => model.FullName)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Birth)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Description)
+            </th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model) {
+                <tr>
+                    <td>
+                        <a asp-action="Details" asp-route-id="@item.StarId">
+                            @Html.DisplayFor(modelItem => item.FullName)
+                        </a>
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.Birth)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.Description)
+                    </td>
+                    <td>
+                        <a asp-action="Edit" asp-route-id="@item.StarId">Edit</a> |
+                        <a asp-action="Delete" asp-route-id="@item.StarId">Delete</a>
+                    </td>
+                </tr>
+        }
+    </tbody>
+</table>

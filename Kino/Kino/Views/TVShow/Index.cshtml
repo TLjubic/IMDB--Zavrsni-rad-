@@ -1,0 +1,75 @@
+﻿@model Kino.Models.Kino.TVIndexModel
+
+@{
+    ViewData["Title"] = "TVShows";
+}
+
+<h2>TV shows</h2>
+
+<p>
+    <a asp-action="Create">Create New</a>
+</p>
+<table class="table">
+    <thead>
+        <tr>
+            <th>
+                Title
+            </th>
+            <th>
+                Release date
+            </th>
+            <th>
+                Number of episodes
+            </th>
+            <th>
+                Genre
+            </th>
+            <th>
+                Stars
+            </th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model.TVShows)
+        {
+            <tr>
+                <td>
+                    <a asp-action="Details" asp-route-id="@item.TVShowId">
+                        @item.Title
+                    </a>
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.ReleaseDate)
+                </td>
+                <td>
+                    @item.NumberOfEpisode
+                </td>
+
+                <td>
+                    @{
+                        foreach (var genre in item.ListOfGenres)
+                        {
+                            @genre.Genre.Name @:
+                        }
+                    }
+                </td>
+                <td>
+                    @{
+                        foreach (var star in item.ListOfStars)
+                        {
+                            <a asp-controller="Star" asp-action="Details" asp-route-id="@star.StarId">
+                                @star.Star.FullName
+                            </a>
+                        }
+                    }
+                </td>
+
+                <td>
+                    <a asp-action="Edit" asp-route-id="@item.TVShowId">Edit</a> |
+                    <a asp-action="Delete" asp-route-id="@item.TVShowId">Delete</a>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
