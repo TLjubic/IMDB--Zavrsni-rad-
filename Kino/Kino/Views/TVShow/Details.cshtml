@@ -1,62 +1,143 @@
-﻿@model Model.TVShow
+﻿@model Kino.Models.Kino.ReviewDetailModel
 
 @{
     ViewData["Title"] = "Details";
+    var imgPath = "~/Images/" + (Model.TVShow.Img ?? "banner1.svg");
 }
 
-<h2>Details</h2>
+<head>
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.css" />
+    <link rel="stylesheet" href="~/css/style.css" />
+    <link href='https://fonts.googleapis.com/css?family=Raleway:400,800,300' rel='stylesheet' type='text/css'>
+    <script src="https://kit.fontawesome.com/a076d05399.js"></script>
+</head>
+
+<ol class="breadcrumb">
+    <li><a asp-action="Index">TV Shows</a></li>
+    <li class="active">Details</li>
+</ol>
+
+
+<div class="details-container">
+
+    <div class="details-title">
+        @Html.DisplayFor(model => model.TVShow.Title)
+    </div>
+
+    <div class="details-img">
+        <img src="@imgPath" asp-append-version="true" />
+    </div>
+
+    <div class="details-info">
+        <dl class="dl-horizontal">
+            <dt>
+                @Html.DisplayNameFor(model => model.TVShow.ReleaseDate)
+            </dt>
+            <dd>
+                @Html.DisplayFor(model => model.TVShow.ReleaseDate)
+            </dd>
+            <dt>
+                @Html.DisplayNameFor(model => model.TVShow.NumberOfEpisode)
+            </dt>
+            <dd>
+                @Html.DisplayFor(model => model.TVShow.NumberOfEpisode)
+            </dd>
+            <dt>
+                Genre
+            </dt>
+            <dd>
+                @foreach (var genre in Model.TVShow.ListOfGenres)
+                {
+                    @genre.Genre.Name @:
+                }
+            </dd>
+            <dt>
+                @Html.DisplayNameFor(model => model.TVShow.Description)
+            </dt>
+            <dd>
+                @Html.DisplayFor(model => model.TVShow.Description)
+            </dd>
+        </dl>
+    </div>
+    <div class="clear"></div>
+</div>
+<div class="details-cast">
+
+    <h5>Cast</h5>
+
+    @foreach (var star in Model.TVShow.ListOfStars)
+    {
+
+        <div class="details-cast-img">
+            <a asp-controller="Star" asp-action="Details" asp-route-id="@star.StarId">
+                <img src="~/images/@star.Star.Img">
+                <h6>@star.Star.FullName</h6>
+            </a>
+        </div>
+    }
+
+</div>
+<div class="clear"></div>
+
+<div class="details-reviews">
+
+    <h5>Reviews</h5>
+
+
+    <h4>Leave review</h4>
+
+    <div class="row">
+
+        <div class="details-review-new create-form">
+            <div class="col-md-8">
+                <form asp-action="CreateReview">
+                    <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+                    <input type="hidden" asp-for="TVShow.TVShowId" />
+                    <div class="form-group">
+                        <label asp-for="TVShowReview.Title" class="control-label"></label>
+                        <input asp-for="TVShowReview.Title" class="form-control" />
+                        <span asp-validation-for="TVShowReview.Title" class="text-danger"></span>
+                    </div>
+                    <div class="form-group">
+                        <label asp-for="TVShowReview.Body" class="control-label"></label>
+                        <textarea asp-for="TVShowReview.Body" class="form-control" rows="5"></textarea>
+                        <span asp-validation-for="TVShowReview.Body" class="text-danger"></span>
+                    </div>
+
+                    <div class="form-group">
+                        <input type="submit" value="Create Review" class="btn btn-default" />
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <div class="details-reviews-list">
+
+            @if (Model.TVShow.ListOfReviews.Count() != 0)
+            {
+
+                @foreach (var item in Model.TVShow.ListOfReviews)
+                {
+
+                    <div>
+                        <span class="review-username">@item.Username</span>
+                        <span class="review-date">@item.Date.ToLongDateString()</span>
+                    </div>
+                    <h4>@item.Title</h4>
+                    <p>@item.Body</p>
+
+                }
+            }
+            else
+            {
+                <p>Be the first to comment</p>
+            }
+        </div>
+
+    </div>
+</div>
 
 <div>
-    <h4>TVShow</h4>
-    <hr />
-    <dl class="dl-horizontal">
-        <dt>
-            @Html.DisplayNameFor(model => model.Title)
-        </dt>
-        <dd>
-            @Html.DisplayFor(model => model.Title)
-        </dd>
-        <dt>
-            @Html.DisplayNameFor(model => model.ReleaseDate)
-        </dt>
-        <dd>
-            @Html.DisplayFor(model => model.ReleaseDate)
-        </dd>
-        <dt>
-            @Html.DisplayNameFor(model => model.NumberOfEpisode)
-        </dt>
-        <dd>
-            @Html.DisplayFor(model => model.NumberOfEpisode)
-        </dd>
-        <dt>
-            Genre
-        </dt>
-        <dd>
-            @foreach (var genre in Model.ListOfGenres)
-            {
-                @genre.Genre.Name @:
-            }
-        </dd>
-        <dt>
-            Cast
-        </dt>
-        <dd>
-            @foreach (var star in Model.ListOfStars)
-            {
-                <a asp-controller="Star" asp-action="Details" asp-route-id="@star.StarId">
-                    @star.Star.FullName
-                </a>
-            }
-        </dd>
-        <dt>
-            @Html.DisplayNameFor(model => model.Description)
-        </dt>
-        <dd>
-            @Html.DisplayFor(model => model.Description)
-        </dd>
-    </dl>
-</div>
-<div>
-    <a asp-action="Edit" asp-route-id="@Model.TVShowId">Edit</a> |
+    <a asp-action="Edit" asp-route-id="@Model.TVShow.TVShowId">Edit</a> |
     <a asp-action="Index">Back to List</a>
 </div>

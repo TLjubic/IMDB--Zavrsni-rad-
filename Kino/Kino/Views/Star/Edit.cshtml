@@ -1,37 +1,52 @@
-﻿@model Model.Star
+﻿@model Kino.Models.Kino.StarViewModel
 
 @{
     ViewData["Title"] = "Edit";
 }
 
-<h2>Edit</h2>
+<head>
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.css" />
+    <link rel="stylesheet" href="~/css/style.css" />
+    <link href='https://fonts.googleapis.com/css?family=Raleway:400,800,300' rel='stylesheet' type='text/css'>
+    <script src="https://kit.fontawesome.com/a076d05399.js"></script>
+</head>
 
-<h4>Star</h4>
-<hr />
-<div class="row">
-    <div class="col-md-4">
-        <form asp-action="Edit">
+<ol class="breadcrumb">
+    <li><a asp-action="Index">Stars</a></li>
+    <li class="active">Edit star</li>
+</ol>
+
+
+<div class="row create-form">
+    <div class="form-position">
+        <form enctype="multipart/form-data" asp-action="Edit">
             <div asp-validation-summary="ModelOnly" class="text-danger"></div>
-            <input type="hidden" asp-for="StarId" />
+            <input type="hidden" asp-for="Star.StarId" />
             <div class="form-group">
-                <label asp-for="FirstName" class="control-label"></label>
-                <input asp-for="FirstName" class="form-control" />
-                <span asp-validation-for="FirstName" class="text-danger"></span>
+                <label asp-for="Star.FirstName" class="control-label"></label>
+                <input asp-for="Star.FirstName" class="form-control" />
+                <span asp-validation-for="Star.FirstName" class="text-danger"></span>
             </div>
             <div class="form-group">
-                <label asp-for="LastName" class="control-label"></label>
-                <input asp-for="LastName" class="form-control" />
-                <span asp-validation-for="LastName" class="text-danger"></span>
+                <label asp-for="Star.LastName" class="control-label"></label>
+                <input asp-for="Star.LastName" class="form-control" />
+                <span asp-validation-for="Star.LastName" class="text-danger"></span>
             </div>
             <div class="form-group">
-                <label asp-for="Birth" class="control-label"></label>
-                <input asp-for="Birth" class="form-control" />
-                <span asp-validation-for="Birth" class="text-danger"></span>
+                <label asp-for="Star.Birth" class="control-label"></label>
+                <input asp-for="Star.Birth" class="form-control" />
+                <span asp-validation-for="Star.Birth" class="text-danger"></span>
             </div>
             <div class="form-group">
-                <label asp-for="Description" class="control-label"></label>
-                <input asp-for="Description" class="form-control" />
-                <span asp-validation-for="Description" class="text-danger"></span>
+                <label asp-for="Star.Description" class="control-label"></label>
+                <textarea asp-for="Star.Description" class="form-control" rows="7"></textarea>
+                <span asp-validation-for="Star.Description" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="Image" class="control-label"></label>
+                <div class="custom-file">
+                    <input asp-for="Image" class="form-control custom-file-input" />
+                </div>
             </div>
             <div class="form-group">
                 <input type="submit" value="Save" class="btn btn-default" />

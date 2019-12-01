@@ -1,68 +1,154 @@
-﻿@model Model.Movie
+﻿@model Kino.Models.Kino.ReviewDetailModel
 
 @{
     ViewData["Title"] = "Details";
+    var imgPath = "~/Images/" + (Model.Movie.Img ?? "banner1.svg"); 
 }
 
-<h2>Details</h2>
+<head>
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.css" />
+    <link rel="stylesheet" href="~/css/style.css" />
+    <link href='https://fonts.googleapis.com/css?family=Raleway:400,800,300' rel='stylesheet' type='text/css'>
+    <script src="https://kit.fontawesome.com/a076d05399.js"></script>
+</head>
+
+<ol class="breadcrumb">
+    <li><a asp-action="Index">Movies</a></li>
+    <li class="active">Details</li>
+</ol>
+
+
+<div class="details-container"> 
+    
+    <div class="details-title">
+        @Html.DisplayFor(model => model.Movie.Title)
+    </div>
+
+    <div class="details-img">
+        <img src="@imgPath" asp-append-version="true" />
+    </div>
+
+    <div class="details-info">
+        <dl class="dl-horizontal">
+            <dt>
+                @Html.DisplayNameFor(model => model.Movie.ReleaseDate)
+            </dt>
+            <dd>
+                @Html.DisplayFor(model => model.Movie.ReleaseDate)
+            </dd>
+            <dt>
+                @Html.DisplayNameFor(model => model.Movie.Runtime)
+            </dt>
+            <dd>
+                @Html.DisplayFor(model => model.Movie.Runtime) min
+            </dd>
+            <dt>
+                Genre
+            </dt>
+            <dd>
+                @foreach (var genre in Model.Movie.ListOfGenres)
+                {
+                    @genre.Genre.Name @:
+                }
+            </dd>
+            <dt>
+                Director
+            </dt>
+            <dd>
+                <a asp-controller="Director" asp-action="Details" asp-route-id="@Model.Movie.Director.DirectorId">
+                    @Html.DisplayFor(model => model.Movie.Director.FullName)
+                </a>
+            </dd>
+            <dt>
+                @Html.DisplayNameFor(model => model.Movie.Description)
+            </dt>
+            <dd>
+                @Html.DisplayFor(model => model.Movie.Description)
+            </dd>
+        </dl>
+    </div>
+    <div class="clear"></div>
+</div>
+<div class="details-cast">
+    
+    <h5>Cast</h5>
+    
+        @foreach (var star in Model.Movie.ListOfStars)
+        {
+
+            <div class="details-cast-img">
+                <a asp-controller="Star" asp-action="Details" asp-route-id="@star.StarId">
+                    <img src="~/images/@star.Star.Img">
+                    <h6>@star.Star.FullName</h6>
+                </a>
+            </div>
+        }
+
+</div>
+<div class="clear"></div>
+
+<div class="details-reviews">
+
+    <h5>Reviews</h5>
+
+
+    <h4>Leave review</h4>
+
+    <div class="row">
+
+        <div class="details-review-new create-form">
+            <div class="col-md-8">
+                <form asp-action="CreateReview">
+                    <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+                    <input type="hidden" asp-for="Movie.MovieId" />
+                    <div class="form-group">
+                        <label asp-for="MovieReview.Title" class="control-label"></label>
+                        <input asp-for="MovieReview.Title" class="form-control" />
+                        <span asp-validation-for="MovieReview.Title" class="text-danger"></span>
+                    </div>
+                    <div class="form-group">
+                        <label asp-for="MovieReview.Body" class="control-label"></label>
+                        <textarea asp-for="MovieReview.Body" class="form-control" rows="5" ></textarea>
+                        <span asp-validation-for="MovieReview.Body" class="text-danger"></span>
+                    </div>
+
+                    <div class="form-group">
+                        <input type="submit" value="Create Review" class="btn btn-default" />
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <div class="details-reviews-list">
+
+            @if (Model.Movie.ListOfReviews.Count() != 0)
+            {
+
+                @foreach (var item in Model.Movie.ListOfReviews)
+                {
+                    <div class="one-review">
+                        <div>
+                            <span class="review-username">@item.Username</span>
+                            <span class="review-date">@item.Date.ToLongDateString()</span>
+                        </div>
+                        <h4>@item.Title</h4>
+                        <p>@item.Body</p>
+                    </div>
+                    
+
+                }
+            }
+            else
+            {
+                <p>Be the first to comment</p>
+            }
+        </div>
+
+    </div>
+</div>
+
 
 <div>
-    <h4>Movie</h4>
-    <hr />
-    <dl class="dl-horizontal">
-        <dt>
-            @Html.DisplayNameFor(model => model.Title)
-        </dt>
-        <dd>
-            @Html.DisplayFor(model => model.Title)
-        </dd>
-        <dt>
-            @Html.DisplayNameFor(model => model.ReleaseDate)
-        </dt>
-        <dd>
-            @Html.DisplayFor(model => model.ReleaseDate)
-        </dd>
-        <dt>
-            @Html.DisplayNameFor(model => model.Runtime)
-        </dt>
-        <dd>
-            @Html.DisplayFor(model => model.Runtime) min
-        </dd>
-        <dt>
-            Genre
-        </dt>
-        <dd>
-            @foreach (var genre in Model.ListOfGenres)
-            {
-                @genre.Genre.Name @:
-            }
-        </dd>
-        <dt>
-            Director
-        </dt>
-        <dd>
-            @Html.DisplayFor(model => model.Director.FullName)
-        </dd>
-        <dt>
-            Cast
-        </dt>
-        <dd>
-            @foreach (var star in Model.ListOfStars)
-            {
-                <a asp-controller="Star" asp-action="Details" asp-route-id="@star.StarId">
-                    @star.Star.FullName
-                </a>
-            }
-        </dd>
-        <dt>
-            @Html.DisplayNameFor(model => model.Description)
-        </dt>
-        <dd>
-            @Html.DisplayFor(model => model.Description)
-        </dd>
-    </dl>
-</div>
-<div>
-    <a asp-action="Edit" asp-route-id="@Model.MovieId">Edit</a> |
+    <a asp-action="Edit" asp-route-id="@Model.Movie.MovieId">Edit</a> |
     <a asp-action="Index">Back to List</a>
 </div>

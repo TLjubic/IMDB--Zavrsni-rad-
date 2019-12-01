@@ -8,16 +8,24 @@ using Microsoft.EntityFrameworkCore;
 using DAL;
 using Model;
 using Kino.Models.Kino;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Hosting;
+using System.IO;
 
 namespace Kino.Controllers
 {
     public class MovieController : Controller
     {
         private readonly KinoDb _context;
+        private UserManager<AppUser> _userManager;
+        private IHostingEnvironment _hostingEnvironment;
 
-        public MovieController(KinoDb context)
+        public MovieController(KinoDb context, UserManager<AppUser> userManager, IHostingEnvironment hostingEnvironment)
         {
             _context = context;
+            _userManager = userManager;
+            _hostingEnvironment = hostingEnvironment;
         }
 
         // GET: Movie
@@ -52,20 +60,41 @@ namespace Kino.Controllers
                 return NotFound();
             }
 
-            var movie = await _context.Movies
+            var viewModel = new ReviewDetailModel();
+
+            viewModel.Movie = await _context.Movies
                 .Include(i => i.ListOfGenres)
                     .ThenInclude(i => i.Genre)
                 .Include(i => i.ListOfStars)
                     .ThenInclude(i => i.Star)
                 .Include(i => i.Director)
+                .Include(i => i.ListOfReviews)
                 .FirstOrDefaultAsync(m => m.MovieId == id);
 
-            if (movie == null)
+            if (viewModel == null)
             {
                 return NotFound();
             }
 
-            return View(movie);
+            return View(viewModel);
+        }
+
+        // POST: Movie/Details/5
+        [Authorize]
+        [HttpPost]
+        public async Task<IActionResult> CreateReview(ReviewDetailModel reviewDetailModel)
+        {
+            var userId = this._userManager.GetUserId(base.User);
+            var userName = this._userManager.GetUserName(base.User);
+
+            MovieReview movieReview = reviewDetailModel.MovieReview;
+            movieReview.MovieId = reviewDetailModel.Movie.MovieId;
+            movieReview.Date = DateTime.Now;
+            movieReview.Username = userName;
+            _context.Add(movieReview);
+            await _context.SaveChangesAsync();
+
+            return RedirectToAction(nameof(Index));
         }
 
         // GET: Movie/Create
@@ -86,6 +115,17 @@ namespace Kino.Controllers
 
             if (ModelState.IsValid)
             {
+
+                string fileName = null;
+
+                if (movieStarModel.Image != null)
+                {
+                    string uploadFile = Path.Combine(_hostingEnvironment.WebRootPath, "images");
+                    fileName = Guid.NewGuid().ToString() + "_" + movieStarModel.Image.FileName;
+                    string filePath = Path.Combine(uploadFile, fileName);
+                    movieStarModel.Image.CopyTo(new FileStream(filePath, FileMode.Create));
+                    movie.Img = fileName;
+                }
 
                 _context.Add(movie);
                 await _context.SaveChangesAsync();
@@ -162,7 +202,9 @@ namespace Kino.Controllers
                 return NotFound();
             }
 
-            var movie = await _context.Movies
+            var viewModel = new MovieEditModel();
+
+            viewModel.Movie = await _context.Movies
                 .Include(i => i.ListOfGenres)
                     .ThenInclude(i => i.Genre)
                 .Include(i => i.ListOfStars)
@@ -171,29 +213,26 @@ namespace Kino.Controllers
                 .AsNoTracking()
                 .FirstOrDefaultAsync(m => m.MovieId == id);
 
-            if (movie == null)
-            {
-                return NotFound();
-            }
-
-            FillGenresData(movie);
+            FillGenresData(viewModel.Movie);
             this.FillDropdown();
 
-            return View(movie);
+            return View(viewModel);
         }
 
         
         // POST: Movie/Edit/5
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int? id, string[] selectedGenres, int[] selectedStars)
+        public async Task<IActionResult> Edit(int? id, MovieEditModel movieEditModel, string[] selectedGenres, int[] selectedStars)
         {
             if (id == null)
             {
                 return NotFound();
             }
 
-            var movieToUpdate = await _context.Movies
+            Movie movie = movieEditModel.Movie; 
+
+            movie = await _context.Movies
                 .Include(i => i.ListOfGenres)
                     .ThenInclude(i => i.Genre)
                 .Include(i => i.ListOfStars)
@@ -201,9 +240,20 @@ namespace Kino.Controllers
                 .Include(i => i.Director)
                 .FirstOrDefaultAsync(m => m.MovieId == id);
 
-            if (await TryUpdateModelAsync<Movie>(movieToUpdate))
+            if (await TryUpdateModelAsync<Movie>(movie))
             {
-                UpdateMovie(selectedGenres, selectedStars, movieToUpdate);
+                UpdateMovie(selectedGenres, selectedStars, movie);
+
+                string fileName = null;
+
+                if (movieEditModel.Image != null)
+                {
+                    string uploadFile = Path.Combine(_hostingEnvironment.WebRootPath, "images");
+                    fileName = Guid.NewGuid().ToString() + "_" + movieEditModel.Image.FileName;
+                    string filePath = Path.Combine(uploadFile, fileName);
+                    movieEditModel.Image.CopyTo(new FileStream(filePath, FileMode.Create));
+                    movie.Img = fileName;
+                }
 
                 await _context.SaveChangesAsync();
                 
@@ -211,11 +261,11 @@ namespace Kino.Controllers
             }
     
 
-            UpdateMovie(selectedGenres, selectedStars, movieToUpdate);
-            FillGenresData(movieToUpdate);
+            UpdateMovie(selectedGenres, selectedStars, movie);
+            FillGenresData(movie);
             this.FillDropdown();
 
-            return View(movieToUpdate);
+            return View(movie);
         }
 
 

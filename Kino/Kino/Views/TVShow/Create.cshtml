@@ -4,36 +4,53 @@
     ViewData["Title"] = "Create";
 }
 
-<h2>Create</h2>
+<head>
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.css" />
+    <link rel="stylesheet" href="~/css/style.css" />
+    <link href='https://fonts.googleapis.com/css?family=Raleway:400,800,300' rel='stylesheet' type='text/css'>
+    <script src="https://kit.fontawesome.com/a076d05399.js"></script>
+</head>
 
-<h4>TVShow</h4>
-<hr />
-<div class="row">
-    <div class="col-md-4">
-        <form asp-action="Create">
+<ol class="breadcrumb">
+    <li><a asp-action="Index">TV Shows</a></li>
+    <li class="active">Create TV show</li>
+</ol>
+
+
+<div class="row create-form">
+    <div class="form-position">
+        <form enctype="multipart/form-data" asp-action="Create">
             <div asp-validation-summary="ModelOnly" class="text-danger"></div>
             <div class="form-group">
                 <label asp-for="TVShow.Title" class="control-label"></label>
                 <input asp-for="TVShow.Title" class="form-control" />
                 <span asp-validation-for="TVShow.Title" class="text-danger"></span>
             </div>
-            <div class="form-group">
+            <div class="form-group form-left">
                 <label asp-for="TVShow.ReleaseDate" class="control-label"></label>
                 <input asp-for="TVShow.ReleaseDate" class="form-control" />
                 <span asp-validation-for="TVShow.ReleaseDate" class="text-danger"></span>
             </div>
-            <div class="form-group">
-                <label asp-for="TVShow.NumberOfEpisode" class="control-label"></label>
+            <div class="form-group form-right">
+                <label asp-for="TVShow.NumberOfEpisode" class="control-label">Episodes number</label>
                 <input asp-for="TVShow.NumberOfEpisode" class="form-control" />
                 <span asp-validation-for="TVShow.NumberOfEpisode" class="text-danger"></span>
             </div>
             <div class="form-group">
                 <label asp-for="TVShow.Description" class="control-label"></label>
-                <input asp-for="TVShow.Description" class="form-control" />
+                <textarea asp-for="TVShow.Description" class="form-control" rows="7"></textarea>
                 <span asp-validation-for="TVShow.Description" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="Image" class="control-label"></label>
+                <div class="custom-file">
+                    <input asp-for="Image" class="form-control custom-file-input" />
+                </div>
             </div>
 
             <div class="form-group">
+                <div class="form-checkbox">
+                    <span>Genre</span>
                 <div class="col-md-offset-2 col-md-10">
                     <table>
                         <tr>
@@ -48,17 +65,22 @@
                                     @:</tr><tr>
                                     }
                                     @:<td>
-                                        <input type="checkbox"
-                                               name="selectedGenres"
-                                               value="@genre.GenreId"
-                                               @(Html.Raw(genre.Check ? "checked=\"checked\"" : "")) />
-                                        @genre.GenreId @:  @genre.Title
+                                          <label class="container-checkbox">
+                                              <input class="form-checkbox"
+                                                     type="checkbox"
+                                                     name="selectedGenres"
+                                                     value="@genre.GenreId"
+                                                     @(Html.Raw(genre.Check ? "checked=\"checked\"" : "")) />
+                                              @genre.Title
+                                              <span class="checkmark"></span>
+                                          </label>
                                     @:</td>
                                 }
                             @:</tr>
                             }
 
                         </table>
+                    </div>
                     </div>
                 </div>
 

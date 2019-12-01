@@ -1,4 +1,5 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore;
 using Model;
 using System;
 using System.Collections.Generic;
@@ -6,7 +7,7 @@ using System.Text;
 
 namespace DAL
 {
-    public class KinoDb : DbContext
+    public class KinoDb : IdentityDbContext<AppUser>
     {
 
         public KinoDb(DbContextOptions options) : base(options) { }
@@ -20,6 +21,8 @@ namespace DAL
         public DbSet<MovieGenre> MovieGenres { get; set; }
         public DbSet<TVShowGenre> TVShowGenres { get; set; }
         public DbSet<TVShowStar> TVShowStars { get; set; }
+        public DbSet<MovieReview> MovieReviews { get; set; }
+        public DbSet<TVShowReview> TVShowReviews { get; set; }
   
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {

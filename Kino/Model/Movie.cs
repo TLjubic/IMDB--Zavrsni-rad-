@@ -20,12 +20,11 @@ namespace Model
 
         public int Runtime { get; set; }
 
-        //public string Img { get; set; }
+        public string Img { get; set; }
         //public string Video { get; set; }
 
         //public double Rating { get; set; }
         //public bool OscarWinner { get; set; }
-        //public Director Director { get; set; }
 
         public string Description { get; set; }
 
@@ -36,6 +35,7 @@ namespace Model
 
         public ICollection<MovieGenre> ListOfGenres { get; set; }
         public ICollection<MovieStar> ListOfStars { get; set; }
+        public ICollection<MovieReview> ListOfReviews { get; set; }
 
     }
 }

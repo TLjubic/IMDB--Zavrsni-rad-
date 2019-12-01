@@ -7,16 +7,21 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using DAL;
 using Model;
+using Microsoft.AspNetCore.Hosting;
+using Kino.Models.Kino;
+using System.IO;
 
 namespace Kino.Controllers
 {
     public class StarController : Controller
     {
         private readonly KinoDb _context;
+        private IHostingEnvironment _hostingEnvironment;
 
-        public StarController(KinoDb context)
+        public StarController(KinoDb context, IHostingEnvironment hostingEnvironment)
         {
             _context = context;
+            _hostingEnvironment = hostingEnvironment;
         }
 
         // GET: Star
@@ -69,15 +74,29 @@ namespace Kino.Controllers
         // POST: Star/Create
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("StarId,FirstName,LastName,Birth,Description")] Star star)
+        public async Task<IActionResult> Create(StarViewModel starViewModel)
         {
+            Star star = starViewModel.Star;
+
             if (ModelState.IsValid)
             {
+                string fileName = null;
+
+                if (starViewModel.Image != null)
+                {
+                    string uploadFile = Path.Combine(_hostingEnvironment.WebRootPath, "images");
+                    fileName = Guid.NewGuid().ToString() + "_" + starViewModel.Image.FileName;
+                    string filePath = Path.Combine(uploadFile, fileName);
+                    starViewModel.Image.CopyTo(new FileStream(filePath, FileMode.Create));
+                    star.Img = fileName;
+                }
+
+
                 _context.Add(star);
                 await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
             }
-            return View(star);
+            return View(starViewModel);
         }
 
         // GET: Star/Edit/5
@@ -88,26 +107,41 @@ namespace Kino.Controllers
                 return NotFound();
             }
 
-            var star = await _context.Stars.FindAsync(id);
-            if (star == null)
+            var viewModel = new StarViewModel();
+
+            viewModel.Star = await _context.Stars.FindAsync(id);
+            if (viewModel.Star == null)
             {
                 return NotFound();
             }
-            return View(star);
+            return View(viewModel);
         }
 
         // POST: Star/Edit/5
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("StarId,FirstName,LastName,Birth,Description")] Star star)
+        public async Task<IActionResult> Edit(int id, StarViewModel starViewModel)
         {
-            if (id != star.StarId)
+            if (id != starViewModel.Star.StarId)
             {
                 return NotFound();
             }
 
+            Star star = starViewModel.Star;
+
             if (ModelState.IsValid)
             {
+                string fileName = null;
+
+                if (starViewModel.Image != null)
+                {
+                    string uploadFile = Path.Combine(_hostingEnvironment.WebRootPath, "images");
+                    fileName = Guid.NewGuid().ToString() + "_" + starViewModel.Image.FileName;
+                    string filePath = Path.Combine(uploadFile, fileName);
+                    starViewModel.Image.CopyTo(new FileStream(filePath, FileMode.Create));
+                    star.Img = fileName;
+                }
+
                 try
                 {
                     _context.Update(star);
@@ -126,7 +160,7 @@ namespace Kino.Controllers
                 }
                 return RedirectToAction(nameof(Index));
             }
-            return View(star);
+            return View(starViewModel);
         }
 
         // GET: Star/Delete/5

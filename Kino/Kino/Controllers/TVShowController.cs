@@ -8,16 +8,24 @@ using Microsoft.EntityFrameworkCore;
 using DAL;
 using Model;
 using Kino.Models.Kino;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Hosting;
+using System.IO;
 
 namespace Kino.Controllers
 {
     public class TVShowController : Controller
     {
         private readonly KinoDb _context;
+        private UserManager<AppUser> _userManager;
+        private IHostingEnvironment _hostingEnvironment;
 
-        public TVShowController(KinoDb context)
+        public TVShowController(KinoDb context, UserManager<AppUser> userManager, IHostingEnvironment hostingEnvironment)
         {
             _context = context;
+            _hostingEnvironment = hostingEnvironment;
+            _userManager = userManager;
         }
 
         // GET: TVShow
@@ -51,20 +59,42 @@ namespace Kino.Controllers
                 return NotFound();
             }
 
-            var tVShow = await _context.TVShows
-                .Include(t => t.ListOfGenres)
-                    .ThenInclude(t => t.Genre)
-                .Include(t => t.ListOfStars)
-                    .ThenInclude(t => t.Star)
+            var viewModel = new ReviewDetailModel();
+
+            viewModel.TVShow = await _context.TVShows
+                .Include(i => i.ListOfGenres)
+                    .ThenInclude(i => i.Genre)
+                .Include(i => i.ListOfStars)
+                    .ThenInclude(i => i.Star)
+                .Include(i => i.ListOfReviews)
                 .FirstOrDefaultAsync(m => m.TVShowId == id);
 
-            if (tVShow == null)
+            if (viewModel == null)
             {
                 return NotFound();
             }
 
-            return View(tVShow);
+            return View(viewModel);
         }
+
+        // POST: TVShow/Details/5
+        [Authorize]
+        [HttpPost]
+        public async Task<IActionResult> CreateReview(ReviewDetailModel reviewDetailModel)
+        {
+            var userId = this._userManager.GetUserId(base.User);
+            var userName = this._userManager.GetUserName(base.User);
+
+            TVShowReview tvShowReview = reviewDetailModel.TVShowReview;
+            tvShowReview.TVShowId = reviewDetailModel.TVShow.TVShowId;
+            tvShowReview.Date = DateTime.Now;
+            tvShowReview.Username = userName;
+            _context.Add(tvShowReview);
+            await _context.SaveChangesAsync();
+
+            return RedirectToAction(nameof(Index));
+        }
+
 
         // GET: TVShow/Create
         public IActionResult Create()
@@ -77,14 +107,24 @@ namespace Kino.Controllers
         // POST: TVShow/Create
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("TVShowId,Title,ReleaseDate,NumberOfEpisode,Description")]
-            string[] selectedGenres, TVShowStarModel tvShowStarModel)
+        public async Task<IActionResult> Create(string[] selectedGenres, TVShowStarModel tvShowStarModel)
         {
 
             TVShow tvShow = tvShowStarModel.TVShow;
 
             if (ModelState.IsValid)
             {
+
+                string fileName = null;
+
+                if (tvShowStarModel.Image != null)
+                {
+                    string uploadFile = Path.Combine(_hostingEnvironment.WebRootPath, "images");
+                    fileName = Guid.NewGuid().ToString() + "_" + tvShowStarModel.Image.FileName;
+                    string filePath = Path.Combine(uploadFile, fileName);
+                    tvShowStarModel.Image.CopyTo(new FileStream(filePath, FileMode.Create));
+                    tvShow.Img = fileName;
+                }
 
                 _context.Add(tvShow);
                 await _context.SaveChangesAsync();
@@ -160,7 +200,9 @@ namespace Kino.Controllers
                 return NotFound();
             }
 
-            var tvShow = await _context.TVShows
+            var viewModel = new TVShowStarModel();
+
+            viewModel.TVShow = await _context.TVShows
                 .Include(t => t.ListOfGenres)
                     .ThenInclude(t => t.Genre)
                 .Include(t => t.ListOfStars)
@@ -168,29 +210,30 @@ namespace Kino.Controllers
                 .AsNoTracking()
                 .FirstOrDefaultAsync(t => t.TVShowId == id);
       
-            if (tvShow == null)
+            if (viewModel.TVShow == null)
             {
                 return NotFound();
             }
 
-            FillGenresData(tvShow);
+            FillGenresData(viewModel.TVShow);
             this.FillDropdown();
 
-            return View(tvShow);
+            return View(viewModel);
         }
 
         // POST: TVShow/Edit/5
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int? id, string[] selectedGenres, int[] selectedStars)
+        public async Task<IActionResult> Edit(int? id, TVShowStarModel model, string[] selectedGenres, int[] selectedStars)
         {
             if (id == null)
             {
                 return NotFound();
             }
 
+            TVShow tvShow = model.TVShow;
 
-            var tvShowToUpdate = await _context.TVShows
+            tvShow = await _context.TVShows
                 .Include(t => t.ListOfGenres)
                     .ThenInclude(t => t.Genre)
                 .Include(t => t.ListOfStars)
@@ -198,20 +241,31 @@ namespace Kino.Controllers
                 .FirstOrDefaultAsync(t => t.TVShowId == id);
 
 
-            if (await TryUpdateModelAsync<TVShow>(tvShowToUpdate))
+            if (await TryUpdateModelAsync<TVShow>(tvShow))
             {
-                UpdateTVShow(selectedGenres, selectedStars, tvShowToUpdate);
+                UpdateTVShow(selectedGenres, selectedStars, tvShow);
+
+                string fileName = null;
+
+                if (model.Image != null)
+                {
+                    string uploadFile = Path.Combine(_hostingEnvironment.WebRootPath, "images");
+                    fileName = Guid.NewGuid().ToString() + "_" + model.Image.FileName;
+                    string filePath = Path.Combine(uploadFile, fileName);
+                    model.Image.CopyTo(new FileStream(filePath, FileMode.Create));
+                    tvShow.Img = fileName;
+                }
 
                 await _context.SaveChangesAsync();
 
                 return RedirectToAction(nameof(Index));
             }
 
-            UpdateTVShow(selectedGenres, selectedStars, tvShowToUpdate);
-            FillGenresData(tvShowToUpdate);
+            UpdateTVShow(selectedGenres, selectedStars, tvShow);
+            FillGenresData(tvShow);
             this.FillDropdown();
 
-            return View(tvShowToUpdate);
+            return View(tvShow);
         }
 
         // GET: TVShow/Delete/5
