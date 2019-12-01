@@ -4,45 +4,49 @@
     ViewData["Title"] = "Stars";
 }
 
-<h2>Stars</h2>
+<head>
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.css" />
+    <link rel="stylesheet" href="~/css/style.css" />
+    <link href='https://fonts.googleapis.com/css?family=Raleway:400,800,300' rel='stylesheet' type='text/css'>
+    <script src="https://kit.fontawesome.com/a076d05399.js"></script>
+</head>
 
-<p>
-    <a asp-action="Create">Create New</a>
-</p>
-<table class="table">
-    <thead>
-        <tr>
-            <th>
-                @Html.DisplayNameFor(model => model.FullName)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Birth)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Description)
-            </th>
-            <th></th>
-        </tr>
-    </thead>
-    <tbody>
-        @foreach (var item in Model) {
-                <tr>
-                    <td>
-                        <a asp-action="Details" asp-route-id="@item.StarId">
-                            @Html.DisplayFor(modelItem => item.FullName)
-                        </a>
-                    </td>
-                    <td>
-                        @Html.DisplayFor(modelItem => item.Birth)
-                    </td>
-                    <td>
-                        @Html.DisplayFor(modelItem => item.Description)
-                    </td>
-                    <td>
-                        <a asp-action="Edit" asp-route-id="@item.StarId">Edit</a> |
-                        <a asp-action="Delete" asp-route-id="@item.StarId">Delete</a>
-                    </td>
-                </tr>
+<body>
+
+    <div class="container">
+
+        <p class="create-button">
+            <a asp-action="Create">Create New</a>
+        </p>
+
+
+        @foreach (var item in Model)
+        {
+            var imgPath = "~/Images/" + (item.Img ?? "banner1.svg");
+
+            <div class="star-index">
+                <div class="star-image">
+                    <a asp-action="Details" asp-route-id="@item.StarId"><img src="@imgPath" asp-append-version="true" /> </a>
+                </div>
+                <div class="star-text">
+                    <div class="star-text-content">
+                        <h5><a asp-action="Details" asp-route-id="@item.StarId">@item.FullName</a></h5>
+                        @if (item.Description.Length > 150)
+                        {
+                            <p>@Html.Raw(item.Description.Substring(0, 150) + "...")
+                                <a asp-action="Details" asp-route-id="@item.StarId">See more</a>
+                            </p>
+
+                        }else
+                        {
+                            <p>@item.Description</p>
+                        }
+                    </div>
+                </div>
+            </div>
         }
-    </tbody>
-</table>
+    </div>
+
+</body>
+
+

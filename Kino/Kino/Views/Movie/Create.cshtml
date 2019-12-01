@@ -4,72 +4,95 @@
     ViewData["Title"] = "Create";
 }
 
-<h2>Create</h2>
+<head>
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.css" />
+    <link rel="stylesheet" href="~/css/style.css" />
+    <link href='https://fonts.googleapis.com/css?family=Raleway:400,800,300' rel='stylesheet' type='text/css'>
+    <script src="https://kit.fontawesome.com/a076d05399.js"></script>
+</head>
 
-<h4>Movie</h4>
-<hr />
-<div class="row">
-    <div class="col-md-4">
-        <form asp-action="Create">
+<ol class="breadcrumb">
+    <li><a asp-action="Index">Movies</a></li>
+    <li class="active">Create movie</li>
+</ol>
+
+<div class="row create-form">
+    <div class="form-position">
+        <form enctype="multipart/form-data" asp-action="Create">
             <div asp-validation-summary="ModelOnly" class="text-danger"></div>
             <div class="form-group">
                 <label asp-for="Movie.Title" class="control-label"></label>
                 <input asp-for="Movie.Title" class="form-control" />
                 <span asp-validation-for="Movie.Title" class="text-danger"></span>
             </div>
-            <div class="form-group">
+            <div class="form-group form-left">
                 <label asp-for="Movie.ReleaseDate" class="control-label"></label>
                 <input asp-for="Movie.ReleaseDate" class="form-control" />
                 <span asp-validation-for="Movie.ReleaseDate" class="text-danger"></span>
             </div>
-            <div class="form-group">
+            <div class="form-group form-right">
                 <label asp-for="Movie.Runtime" class="control-label"></label>
                 <input asp-for="Movie.Runtime" class="form-control" />
                 <span asp-validation-for="Movie.Runtime" class="text-danger"></span>
             </div>
             <div class="form-group">
                 <label asp-for="Movie.Description" class="control-label"></label>
-                <input asp-for="Movie.Description" class="form-control" />
+                <textarea asp-for="Movie.Description" class="form-control" rows="7"></textarea>
                 <span asp-validation-for="Movie.Description" class="text-danger"></span>
             </div>
+            <div class="form-group">
+                <label asp-for="Image" class="control-label custom-file-upload"></label>
+                <div class="custom-file">
+                    <input asp-for="Image" class="form-control" />
+                </div>
+            </div>
+
+            
 
             <div class="form-group">
                 <label class="control-label">Director</label>
-                <select asp-for="Movie.DirectorId" class="select-picker form-control" 
+                <select asp-for="Movie.DirectorId" class="select-picker form-control"
                         placeholder="" asp-items="ViewBag.PossibleDirectors"></select>
             </div>
 
             <div class="form-group">
-                <div class="col-md-offset-2 col-md-10"> 
-                    <table>
-                        <tr>
-                            @{
-                                int cnt = 0;
-                                List<Kino.Models.Kino.MovieGenreModel> genres = ViewBag.GenresMovieNew;
+                <div class="form-checkbox">
+                    <span>Genre</span>
+                    <div class="col-md-offset-1 col-md-12">
+                        <table>
+                            <tr>
+                                @{
+                                    int cnt = 0;
+                                    List<Kino.Models.Kino.MovieGenreModel> genres = ViewBag.GenresMovieNew;
 
-                                foreach (var genre in genres)
-                                {
-                                    if (cnt++ % 3 == 0)
+                                    foreach (var genre in genres)
                                     {
-                                    @:</tr><tr>
+                                        if (cnt++ % 3 == 0)
+                                        {
+                                        @:</tr><tr>
+                                        }
+                                        @:<td>
+                                            <label class="container-checkbox">
+                                                <input class="form-checkbox"
+                                                       type="checkbox"
+                                                       name="selectedGenres"
+                                                       value="@genre.GenreId"
+                                                       @(Html.Raw(genre.Check ? "checked=\"checked\"" : "")) />
+                                                @genre.Title
+                                                <span class="checkmark"></span>
+                                            </label>
+                                        @:</td>
                                     }
-                                    @:<td>
-                                        <input type="checkbox"
-                                               name="selectedGenres"
-                                               value="@genre.GenreId"
-                                               @(Html.Raw(genre.Check ? "checked=\"checked\"" : "")) />
-                                        @genre.GenreId @:  @genre.Title
-                                    @:</td>
+                                @:</tr>
                                 }
-                            @:</tr>
-                            }
 
-                        </table>
+                            </table>
+                        </div>
                     </div>
                 </div>
 
                 <div class="form-group">
-                    <label class="control-label">Star</label>
+                    <label class="control-label star-form-margin">Star</label>
                     <select asp-for="selectedStars" class="select-picker form-control" multiple="multiple"
                             id="star" placeholder="" asp-items="ViewBag.PossibleStars" SelectionMode="Multiple"></select>
                 </div>

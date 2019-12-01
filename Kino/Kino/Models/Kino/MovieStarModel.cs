@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc.Rendering;
+﻿using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc.Rendering;
 using Model;
 using System;
 using System.Collections.Generic;
@@ -12,5 +13,6 @@ namespace Kino.Models.Kino
     {
         public Movie Movie { get; set; }
         public List<int> selectedStars { get; set; }
+        public IFormFile Image { get; set; }
     }
 }

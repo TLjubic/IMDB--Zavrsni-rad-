@@ -11,6 +11,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Model;
 
 namespace Kino
 {
@@ -37,6 +38,16 @@ namespace Kino
                 options.UseSqlServer(
                     Configuration.GetConnectionString("KinoDb")));
 
+            services.AddDefaultIdentity<AppUser>()
+                .AddEntityFrameworkStores<KinoDb>();
+
+            services.AddAuthentication().AddGoogle(googleOptions =>
+            {
+                googleOptions.ClientId = "290441441959-trrqv7s2pp9qlfjsr3d9gstjl9e78qar.apps.googleusercontent.com";
+                googleOptions.ClientSecret = "1oHE6ykhCvUFtVa-gFipQDoF";
+                googleOptions.SaveTokens = false;
+
+            });
 
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_1);
         }
@@ -57,6 +68,7 @@ namespace Kino
             app.UseHttpsRedirection();
             app.UseStaticFiles();
             app.UseCookiePolicy();
+            app.UseAuthentication();
 
             DbInitializer.Initialize(context);
 

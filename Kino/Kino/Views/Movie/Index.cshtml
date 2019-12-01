@@ -4,71 +4,50 @@
     ViewData["Title"] = "Movies";
 }
 
-<h2>Movies</h2>
+<head>
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.css" />
+    <link rel="stylesheet" href="~/css/style.css" />
+    <link href='https://fonts.googleapis.com/css?family=Raleway:400,800,300' rel='stylesheet' type='text/css'>
+    <script src="https://kit.fontawesome.com/a076d05399.js"></script>
+</head>
+<body>
+    
+    <div class="container">
+        
+        <p class="create-button">
+            <a asp-action="Create">Create New</a>
+        </p>
 
-<p>
-    <a asp-action="Create">Create New</a>
-</p>
-<table class="table">
-    <thead>
-        <tr>
-            <th>
-                Title
-            </th>
-            <th>
-                Release date
-            </th>
-            <th>
-                Runtime
-            </th>
-            <th>
-                Genre
-            </th>
-            <th>
-                Stars
-            </th>
-            <th></th>
-        </tr>
-    </thead>
-    <tbody>
-        @foreach (var item in Model.Movies) {
-                <tr>
-                    <td>
-                        <a asp-action="Details" asp-route-id="@item.MovieId">
-                            @item.Title
-                        </a>
-                    </td>
-                    <td>
-                        @Html.DisplayFor(modelItem => item.ReleaseDate)
-                    </td>
-                    <td>
-                        @Html.DisplayFor(modelItem => item.Runtime) min
-                    </td>
-            
-                    <td>
-                        @{
-                            foreach (var genre in item.ListOfGenres)
-                            {
-                                @genre.Genre.Name @: 
-                            }
-                        }
-                    </td>
-                    <td>
-                        @{ 
-                            foreach (var star in item.ListOfStars)
-                            {
-                                <a asp-controller="Star" asp-action="Details" asp-route-id="@star.StarId">
-                                    @star.Star.FullName
-                                </a>
-                            }   
-                        }
-                    </td>
+        @foreach (var item in Model.Movies)
+        {
+            var imgPath = "~/Images/" + (item.Img ?? "banner1.svg");
+
+            <div class="box">
+               <a asp-action="Details" asp-route-id="@item.MovieId">
                     
-                    <td>
-                        <a asp-action="Edit" asp-route-id="@item.MovieId">Edit</a> |
-                        <a asp-action="Delete" asp-route-id="@item.MovieId">Delete</a>
-                    </td>
-                </tr>
+                    <img src="@imgPath" asp-append-version="true" />
+                    <div class="box-content">
+                        <h3 class="genre-title">
+                        @{
+                           foreach (var genre in item.ListOfGenres)
+                           {
+                                @genre.Genre.Name @:
+                           }
+                        }
+                        </h3>
+                        <span class="title">@item.Title</span>
+                        <span class="year">@item.ReleaseDate</span>
+                                
+                        <a href="#"><i class="far fa-heart"></i></a>
+                        <a href="#"><i class="fa fa-link"></i></a>
+                                
+                    </div>
+                    
+               </a>
+            </div>
         }
-    </tbody>
-</table>
+
+    </div>            
+
+</body>
+

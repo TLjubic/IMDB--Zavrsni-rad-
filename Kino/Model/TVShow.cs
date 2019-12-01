@@ -20,16 +20,16 @@ namespace Model
         [Display(Name = "Number of episodes")]
         public int NumberOfEpisode { get; set; }
 
-        //public string Img { get; set; }
+        public string Img { get; set; }
         //public string Video { get; set; }
 
         //public double Rating { get; set; }
-        //public Director Director { get; set; }
 
         public string Description { get; set; }
 
         public ICollection<TVShowGenre> ListOfGenres { get; set; }
         public ICollection<TVShowStar> ListOfStars { get; set; }
+        public ICollection<TVShowReview> ListOfReviews { get; set; }
 
 
     }

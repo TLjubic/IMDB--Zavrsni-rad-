@@ -19,6 +19,175 @@ namespace DAL.Migrations
                 .HasAnnotation("Relational:MaxIdentifierLength", 128)
                 .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
+            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRole", b =>
+                {
+                    b.Property<string>("Id")
+                        .ValueGeneratedOnAdd();
+
+                    b.Property<string>("ConcurrencyStamp")
+                        .IsConcurrencyToken();
+
+                    b.Property<string>("Name")
+                        .HasMaxLength(256);
+
+                    b.Property<string>("NormalizedName")
+                        .HasMaxLength(256);
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("NormalizedName")
+                        .IsUnique()
+                        .HasName("RoleNameIndex")
+                        .HasFilter("[NormalizedName] IS NOT NULL");
+
+                    b.ToTable("AspNetRoles");
+                });
+
+            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+
+                    b.Property<string>("ClaimType");
+
+                    b.Property<string>("ClaimValue");
+
+                    b.Property<string>("RoleId")
+                        .IsRequired();
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("RoleId");
+
+                    b.ToTable("AspNetRoleClaims");
+                });
+
+            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserClaim<string>", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+
+                    b.Property<string>("ClaimType");
+
+                    b.Property<string>("ClaimValue");
+
+                    b.Property<string>("UserId")
+                        .IsRequired();
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("AspNetUserClaims");
+                });
+
+            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserLogin<string>", b =>
+                {
+                    b.Property<string>("LoginProvider")
+                        .HasMaxLength(128);
+
+                    b.Property<string>("ProviderKey")
+                        .HasMaxLength(128);
+
+                    b.Property<string>("ProviderDisplayName");
+
+                    b.Property<string>("UserId")
+                        .IsRequired();
+
+                    b.HasKey("LoginProvider", "ProviderKey");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("AspNetUserLogins");
+                });
+
+            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserRole<string>", b =>
+                {
+                    b.Property<string>("UserId");
+
+                    b.Property<string>("RoleId");
+
+                    b.HasKey("UserId", "RoleId");
+
+                    b.HasIndex("RoleId");
+
+                    b.ToTable("AspNetUserRoles");
+                });
+
+            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserToken<string>", b =>
+                {
+                    b.Property<string>("UserId");
+
+                    b.Property<string>("LoginProvider")
+                        .HasMaxLength(128);
+
+                    b.Property<string>("Name")
+                        .HasMaxLength(128);
+
+                    b.Property<string>("Value");
+
+                    b.HasKey("UserId", "LoginProvider", "Name");
+
+                    b.ToTable("AspNetUserTokens");
+                });
+
+            modelBuilder.Entity("Model.AppUser", b =>
+                {
+                    b.Property<string>("Id")
+                        .ValueGeneratedOnAdd();
+
+                    b.Property<int>("AccessFailedCount");
+
+                    b.Property<string>("ConcurrencyStamp")
+                        .IsConcurrencyToken();
+
+                    b.Property<string>("Email")
+                        .HasMaxLength(256);
+
+                    b.Property<bool>("EmailConfirmed");
+
+                    b.Property<string>("FirstName");
+
+                    b.Property<string>("LastName");
+
+                    b.Property<bool>("LockoutEnabled");
+
+                    b.Property<DateTimeOffset?>("LockoutEnd");
+
+                    b.Property<string>("NormalizedEmail")
+                        .HasMaxLength(256);
+
+                    b.Property<string>("NormalizedUserName")
+                        .HasMaxLength(256);
+
+                    b.Property<string>("PasswordHash");
+
+                    b.Property<string>("PhoneNumber");
+
+                    b.Property<bool>("PhoneNumberConfirmed");
+
+                    b.Property<string>("SecurityStamp");
+
+                    b.Property<bool>("TwoFactorEnabled");
+
+                    b.Property<string>("UserName")
+                        .HasMaxLength(256);
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("NormalizedEmail")
+                        .HasName("EmailIndex");
+
+                    b.HasIndex("NormalizedUserName")
+                        .IsUnique()
+                        .HasName("UserNameIndex")
+                        .HasFilter("[NormalizedUserName] IS NOT NULL");
+
+                    b.ToTable("AspNetUsers");
+                });
+
             modelBuilder.Entity("Model.Director", b =>
                 {
                     b.Property<int>("DirectorId")
@@ -31,6 +200,8 @@ namespace DAL.Migrations
 
                     b.Property<string>("FirstName")
                         .IsRequired();
+
+                    b.Property<string>("Img");
 
                     b.Property<string>("LastName")
                         .IsRequired();
@@ -74,6 +245,8 @@ namespace DAL.Migrations
 
                     b.Property<int>("DirectorId");
 
+                    b.Property<string>("Img");
+
                     b.Property<DateTime>("ReleaseDate");
 
                     b.Property<int>("Runtime");
@@ -99,6 +272,29 @@ namespace DAL.Migrations
                     b.HasIndex("GenreId");
 
                     b.ToTable("MovieGenres");
+                });
+
+            modelBuilder.Entity("Model.MovieReview", b =>
+                {
+                    b.Property<int>("MovieReviewId")
+                        .ValueGeneratedOnAdd()
+                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+
+                    b.Property<string>("Body");
+
+                    b.Property<DateTime>("Date");
+
+                    b.Property<int>("MovieId");
+
+                    b.Property<string>("Title");
+
+                    b.Property<string>("Username");
+
+                    b.HasKey("MovieReviewId");
+
+                    b.HasIndex("MovieId");
+
+                    b.ToTable("MovieReviews");
                 });
 
             modelBuilder.Entity("Model.MovieStar", b =>
@@ -127,6 +323,8 @@ namespace DAL.Migrations
                     b.Property<string>("FirstName")
                         .IsRequired();
 
+                    b.Property<string>("Img");
+
                     b.Property<string>("LastName")
                         .IsRequired();
 
@@ -142,6 +340,8 @@ namespace DAL.Migrations
                         .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
                     b.Property<string>("Description");
+
+                    b.Property<string>("Img");
 
                     b.Property<int>("NumberOfEpisode");
 
@@ -168,6 +368,29 @@ namespace DAL.Migrations
                     b.ToTable("TVShowGenres");
                 });
 
+            modelBuilder.Entity("Model.TVShowReview", b =>
+                {
+                    b.Property<int>("TVShowReviewId")
+                        .ValueGeneratedOnAdd()
+                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+
+                    b.Property<string>("Body");
+
+                    b.Property<DateTime>("Date");
+
+                    b.Property<int>("TVShowId");
+
+                    b.Property<string>("Title");
+
+                    b.Property<string>("Username");
+
+                    b.HasKey("TVShowReviewId");
+
+                    b.HasIndex("TVShowId");
+
+                    b.ToTable("TVShowReviews");
+                });
+
             modelBuilder.Entity("Model.TVShowStar", b =>
                 {
                     b.Property<int>("TVShowId");
@@ -181,10 +404,55 @@ namespace DAL.Migrations
                     b.ToTable("TVShowStars");
                 });
 
+            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>
+                {
+                    b.HasOne("Microsoft.AspNetCore.Identity.IdentityRole")
+                        .WithMany()
+                        .HasForeignKey("RoleId")
+                        .OnDelete(DeleteBehavior.Cascade);
+                });
+
+            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserClaim<string>", b =>
+                {
+                    b.HasOne("Model.AppUser")
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade);
+                });
+
+            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserLogin<string>", b =>
+                {
+                    b.HasOne("Model.AppUser")
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade);
+                });
+
+            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserRole<string>", b =>
+                {
+                    b.HasOne("Microsoft.AspNetCore.Identity.IdentityRole")
+                        .WithMany()
+                        .HasForeignKey("RoleId")
+                        .OnDelete(DeleteBehavior.Cascade);
+
+                    b.HasOne("Model.AppUser")
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade);
+                });
+
+            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserToken<string>", b =>
+                {
+                    b.HasOne("Model.AppUser")
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade);
+                });
+
             modelBuilder.Entity("Model.Movie", b =>
                 {
                     b.HasOne("Model.Director", "Director")
-                        .WithMany()
+                        .WithMany("ListOfMovies")
                         .HasForeignKey("DirectorId")
                         .OnDelete(DeleteBehavior.Cascade);
                 });
@@ -202,6 +470,14 @@ namespace DAL.Migrations
                         .OnDelete(DeleteBehavior.Cascade);
                 });
 
+            modelBuilder.Entity("Model.MovieReview", b =>
+                {
+                    b.HasOne("Model.Movie", "Movie")
+                        .WithMany("ListOfReviews")
+                        .HasForeignKey("MovieId")
+                        .OnDelete(DeleteBehavior.Cascade);
+                });
+
             modelBuilder.Entity("Model.MovieStar", b =>
                 {
                     b.HasOne("Model.Movie", "Movie")
@@ -210,7 +486,7 @@ namespace DAL.Migrations
                         .OnDelete(DeleteBehavior.Cascade);
 
                     b.HasOne("Model.Star", "Star")
-                        .WithMany()
+                        .WithMany("ListOfMovies")
                         .HasForeignKey("StarId")
                         .OnDelete(DeleteBehavior.Cascade);
                 });
@@ -228,10 +504,18 @@ namespace DAL.Migrations
                         .OnDelete(DeleteBehavior.Cascade);
                 });
 
+            modelBuilder.Entity("Model.TVShowReview", b =>
+                {
+                    b.HasOne("Model.TVShow", "TVShow")
+                        .WithMany("ListOfReviews")
+                        .HasForeignKey("TVShowId")
+                        .OnDelete(DeleteBehavior.Cascade);
+                });
+
             modelBuilder.Entity("Model.TVShowStar", b =>
                 {
                     b.HasOne("Model.Star", "Star")
-                        .WithMany()
+                        .WithMany("ListOfTVShows")
                         .HasForeignKey("StarId")
                         .OnDelete(DeleteBehavior.Cascade);
 

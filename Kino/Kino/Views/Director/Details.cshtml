@@ -2,78 +2,70 @@
 
 @{
     ViewData["Title"] = "Details";
+    var imgPath = "~/Images/" + (Model.Img ?? "banner1.svg");
 }
 
-<h2>Details</h2>
+<head>
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.css" />
+    <link rel="stylesheet" href="~/css/style.css" />
+    <link href='https://fonts.googleapis.com/css?family=Raleway:400,800,300' rel='stylesheet' type='text/css'>
+    <script src="https://kit.fontawesome.com/a076d05399.js"></script>
+</head>
 
-<div>
-    <h4>Director</h4>
-    <hr />
-    <dl class="dl-horizontal">
-        <dt>
-            @Html.DisplayNameFor(model => model.FirstName)
-        </dt>
-        <dd>
-            @Html.DisplayFor(model => model.FirstName)
-        </dd>
-        <dt>
-            @Html.DisplayNameFor(model => model.LastName)
-        </dt>
-        <dd>
-            @Html.DisplayFor(model => model.LastName)
-        </dd>
-        <dt>
-            @Html.DisplayNameFor(model => model.Birth)
-        </dt>
-        <dd>
-            @Html.DisplayFor(model => model.Birth)
-        </dd>
-        <dt>
-            @Html.DisplayNameFor(model => model.Description)
-        </dt>
-        <dd>
-            @Html.DisplayFor(model => model.Description)
-        </dd>
-    </dl>
+<ol class="breadcrumb">
+    <li><a asp-action="Index">Directors</a></li>
+    <li class="active">Details</li>
+</ol>
+
+
+<div class="details-container">
+
+    <div class="details-title">
+        @Html.DisplayFor(model => model.FullName)
+    </div>
+
+    <div class="details-img">
+        <img src="@imgPath" asp-append-version="true" />
+    </div>
+
+    <div class="details-info">
+        <dl class="dl-horizontal">
+            <dt>
+                @Html.DisplayNameFor(model => model.Birth)
+            </dt>
+            <dd>
+                @Html.DisplayFor(model => model.Birth)
+            </dd>
+            <dt>
+                @Html.DisplayNameFor(model => model.Description)
+            </dt>
+            <dd>
+                @Html.DisplayFor(model => model.Description)
+            </dd>
+        </dl>
+    </div>
+    <div class="clear"></div>
 </div>
-<br />
-<h4>Movies</h4><hr />
 
-               <table class="table container">
+@if (Model.ListOfMovies.Count() > 0)
+{
+    <div class="details-cast">
 
-                   <thead>
-                       <tr>
-                           <th>
-                               Title
-                           </th>
-                           <th>
-                               Release date
-                           </th>
-                           <th>
-                               Runtime
-                           </th>
-                       </tr>
-                   </thead>
-                   <tbody>
-                       @foreach (var movie in Model.ListOfMovies)
-                       {
-                           <tr>
-                               <td>
-                                   <a asp-controller="Movie" asp-action="Details" asp-route-id="@movie.MovieId">
-                                       @movie.Title
-                                   </a>
-                               </td>  
-                               <td>
-                                   @Html.DisplayFor(model => movie.ReleaseDate)
-                               </td>
-                               <td>
-                                   @movie.Runtime min
-                               </td>
-                           </tr>
-                       }
-                   </tbody>
+        <h5>Movies</h5>
 
-               </table>
+        @foreach (var movie in Model.ListOfMovies)
+        {
+
+            <div class="details-cast-img">
+                <a asp-controller="Movie" asp-action="Details" asp-route-id="@movie.MovieId">
+                    <img src="~/images/@movie.Img">
+                    <h6>@movie.Title</h6>
+                </a>
+            </div>
+        }
+
+    </div>
+}
 
 <div>
     <a asp-action="Edit" asp-route-id="@Model.DirectorId">Edit</a> |

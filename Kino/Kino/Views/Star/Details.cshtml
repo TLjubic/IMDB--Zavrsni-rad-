@@ -2,143 +2,97 @@
 
 @{
     ViewData["Title"] = "Details";
+    var imgPath = "~/Images/" + (Model.Img ?? "banner1.svg");
 }
 
-<h2>Details</h2>
+<head>
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.css" />
+    <link rel="stylesheet" href="~/css/style.css" />
+    <link href='https://fonts.googleapis.com/css?family=Raleway:400,800,300' rel='stylesheet' type='text/css'>
+    <script src="https://kit.fontawesome.com/a076d05399.js"></script>
+</head>
 
-<div>
-    <h4>Star</h4>
-    <hr />
-    <dl class="dl-horizontal">
-        <dt>
-            @Html.DisplayNameFor(model => model.FirstName)
-        </dt>
-        <dd>
-            @Html.DisplayFor(model => model.FirstName)
-        </dd>
-        <dt>
-            @Html.DisplayNameFor(model => model.LastName)
-        </dt>
-        <dd>
-            @Html.DisplayFor(model => model.LastName)
-        </dd>
-        <dt>
-            @Html.DisplayNameFor(model => model.Birth)
-        </dt>
-        <dd>
-            @Html.DisplayFor(model => model.Birth)
-        </dd>
-        <dt>
-            @Html.DisplayNameFor(model => model.Description)
-        </dt>
-        <dd>
-            @Html.DisplayFor(model => model.Description)
-        </dd>
-    </dl>
-
-    <br /><br />
-    <h4>
-        Movies
-    </h4><hr />
-
-    <table class="table container">
-
-        <thead>
-            <tr>
-                <th>
-                    Title
-                </th>
-                <th>
-                    Genre
-                </th>
-                <th>
-                    Release date
-                </th>
-                <th>
-                    Runtime
-                </th>
-            </tr>
-        </thead>
-        <tbody>
-            @foreach (var movie in Model.ListOfMovies)
-            {
-                <tr>
-                    <td>
-                        <a asp-controller="Movie" asp-action="Details" asp-route-id="@movie.MovieId">
-                            @movie.Movie.Title
-                        </a>
-                    </td>
-                    <td>
-                        @foreach (var genre in movie.Movie.ListOfGenres)
-                        {
-                            @genre.Genre.Name @:
-                        }
-                    </td>
-                    <td>
-                        @Html.DisplayFor(model => movie.Movie.ReleaseDate)
-                    </td>
-                    <td>
-                        @movie.Movie.Runtime min
-                    </td>
-                </tr>
-            }
-        </tbody>
-
-    </table>
-
-    <br /><br />
-    <h4>
-        TV shows
-    </h4><hr />
-
-    <table class="table container">
-
-        <thead>
-            <tr>
-                <th>
-                    Title
-                </th>
-                <th>
-                    Genre
-                </th>
-                <th>
-                    Release date
-                </th>
-                <th>
-                    Number of episodes
-                </th>
-            </tr>
-        </thead>
-        <tbody>
-            @foreach (var tvShow in Model.ListOfTVShows)
-            {
-                <tr>
-                    <td>
-                        <a asp-controller="TVShow" asp-action="Details" asp-route-id="@tvShow.TVShowId">
-                            @tvShow.TVShow.Title
-                        </a>
-                    </td>
-                    <td>
-                        @foreach (var genre in tvShow.TVShow.ListOfGenres)
-                        {
-                            @genre.Genre.Name @:
-                        }
-                    </td>
-                    <td>
-                        @Html.DisplayFor(model => tvShow.TVShow.ReleaseDate)
-                    </td>
-                    <td>
-                        @tvShow.TVShow.NumberOfEpisode
-                    </td>
-                </tr>
-            }
-        </tbody>
-
-    </table>
+<ol class="breadcrumb">
+    <li><a asp-action="Index">Stars</a></li>
+    <li class="active">Details</li>
+</ol>
 
 
+<div class="details-container">
+
+    <div class="details-title">
+        @Html.DisplayFor(model => model.FullName)
+    </div>
+
+    <div class="details-img">
+        <img src="@imgPath" asp-append-version="true" />
+    </div>
+
+    <div class="details-info">
+        <dl class="dl-horizontal">
+            <dt>
+                @Html.DisplayNameFor(model => model.Birth)
+            </dt>
+            <dd>
+                @Html.DisplayFor(model => model.Birth)
+            </dd>
+            <dt>
+                @Html.DisplayNameFor(model => model.Description)
+            </dt>
+            <dd>
+                @Html.DisplayFor(model => model.Description)
+            </dd>
+        </dl>
+    </div>
+    <div class="clear"></div>
 </div>
-<div>
-    <a asp-action="Edit" asp-route-id="@Model.StarId">Edit</a> |
-    <a asp-action="Index">Back to List</a>
-</div>
+
+@if (Model.ListOfMovies.Count() > 0)
+{
+    <div class="details-cast">
+
+        <h5>Movies</h5>
+
+        @foreach (var star in Model.ListOfMovies)
+        {
+
+            <div class="details-cast-img">
+                <a asp-controller="Movie" asp-action="Details" asp-route-id="@star.Movie.MovieId">
+                    <img src="~/images/@star.Movie.Img">
+                    <h6>@star.Movie.Title</h6>
+                </a>
+            </div>
+        }
+
+    </div>
+}
+
+<div class="clear"></div>
+
+@if (Model.ListOfTVShows.Count() > 0)
+{
+
+    <div class="details-cast">
+
+        <h5>TV Shows</h5>
+
+        @foreach (var star in Model.ListOfTVShows)
+        {
+
+            <div class="details-cast-img">
+                <a asp-controller="TVShow" asp-action="Details" asp-route-id="@star.TVShow.TVShowId">
+                    <img src="~/images/@star.TVShow.Img">
+                    <h6>@star.TVShow.Title</h6>
+                </a>
+            </div>
+        }
+
+    </div>
+}
+
+    <div class="clear"></div>
+
+    <div class="margin-top-footer">
+        <a asp-action="Edit" asp-route-id="@Model.StarId">Edit</a> |
+        <a asp-action="Index">Back to List</a>
+    </div>
