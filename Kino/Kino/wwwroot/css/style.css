@@ -9,7 +9,7 @@
 
 /* Navigation */
 nav {
-    padding: 20px;
+    padding: 30px 0 30px;
     background: -webkit-gradient(linear, left top, right top, color-stop(0%, rgba(8,13,17,1)), color-stop(2%, rgba(8,13,17,1)), color-stop(50%, rgba(20,40,50,1)), color-stop(99%, rgba(8,13,17,1)), color-stop(100%, rgba(8,13,17,1))); /* safari4+,chrome */
     background: -webkit-linear-gradient(0deg, rgba(8,13,17,1) 0%, rgba(8,13,17,1) 2%, rgba(20,40,50,1) 50%, rgba(8,13,17,1) 99%, rgba(8,13,17,1) 100%); /* safari5.1+,chrome10+ */
     background: -o-linear-gradient(0deg, rgba(8,13,17,1) 0%, rgba(8,13,17,1) 2%, rgba(20,40,50,1) 50%, rgba(8,13,17,1) 99%, rgba(8,13,17,1) 100%); /* opera 11.10+ */
@@ -20,30 +20,51 @@ nav {
     position: fixed;
     top: 0;
     width: 100%;
-    z-index: 10;
+    z-index: 100;
 }
+
+    nav ul.primary {
+        position: relative;
+        top: 10px;
+    }
+
+        nav ul.primary i {
+            position: relative;
+            top: -2px;
+        }
 
     nav li {
         display: inline;
         text-decoration: none;
+        padding: 0 10px;
+        float: left;
+    }
+    nav ul.sub li {
         padding: 10px;
+    }
+    nav ul.sub {
+        margin-top: 15px;
     }
 
         nav li span {
+            display: block;
             margin-right: 50px;
+            margin-top: -30px;
         }
 
-            nav li span {
-                font-size: 2em;
+        nav li span {
+            font-size: 2em;
+        }
+
+            nav li span a {
+                color: rgb(168, 127, 24);
             }
-                nav li span a {
-                    color: rgb(168, 127, 24);
-                }
 
         nav li a {
             text-decoration: none;
             color: rgb(182, 179, 179);
-            font-size: 1.2em !important;
+            font-size: 1.5em;
+            display: block;
         }
 
             nav li a:hover {
@@ -51,23 +72,163 @@ nav {
                 text-decoration: none;
             }
 
-       .navbar-right {
-           position: relative;
-           top: 15px;
-           right: 30px;
-       }
+.navbar-right {
+    position: relative;
+    right: 30px;
+    font-size: 0.7em;
+}
+
+nav .sub .category_li {
+    font-size: 0.8em;
+    color: gray;
+    position: relative;
+    padding: 10px;
+    margin-top: 10px;
+    margin-left: -25px;
+}
+
+/* clear'n floats */
+ul:after {
+    clear: both;
+}
+
+/* sub display*/
+ul.primary li:hover ul {
+    display: block;
+    background-color: rgb(6, 10, 13);
+}
+
+/* subs */
+ul.sub {
+    position: absolute;
+    z-index: 200;
+    padding: 0px 0px;
+    display: none;
+    width: 30%;
+    border-bottom: 1px solid rgb(168, 127, 24);
+    border-left: 1px solid rgb(168, 127, 24);
+    margin-top: 10px;
+    border-bottom-left-radius: 10px;
+}
+
+    ul.sub li {
+        float: none;
+        display: block;
+        margin: -20px 0 0 10px;
+    }
+
+    ul.sub a {
+        color: rgb(182, 179, 179);
+        font-size: 1.1em;
+    }
+
+    ul.sub li a:hover {
+        color: rgb(168, 127, 24);
+    }
+
+    ul.sub .menu_left {
+        width: 45%;
+        float: left;
+    }
+
+        ul.sub .menu_left::after {
+            clear: both;
+        }
+
+
+
+
+
+@media only screen and (max-width: 600px) {
+    .decor {
+        padding: 3px;
+    }
+
+    .wrap {
+        width: 100%;
+        margin-top: 0px;
+    }
+
+    li {
+        float: none;
+    }
+
+    ul.primary li:hover a {
+        background: none;
+        color: #8B8B8B;
+        text-shadow: 1px 1px #000;
+    }
+
+    ul.primary li:hover ul {
+        display: block;
+        background: #272727;
+        color: #fff;
+    }
+
+    ul.sub {
+        display: block;
+        position: static;
+        box-shadow: none;
+        width: 100%;
+    }
+
+        ul.sub li a {
+            background: #272727;
+            border: none;
+            color: #8B8B8B;
+        }
+
+            ul.sub li a:hover {
+                color: #ccc;
+                background: none;
+            }
+}
+
+
 
 
 /* Movie slide */
 .create-button {
     margin: -20px 0 50px -20px;
 }
-.create-button a {
-    color: rgb(168, 127, 24);
+
+    .create-button a {
+        color: rgb(168, 127, 24);
+    }
+
+        .create-button a:hover {
+            text-decoration: none;
+        }
+
+.sort-options {
+    float: right;
+    margin-right: 50px;
+    text-align: center;
+    padding: 10px 10px 2px;
+    border-bottom: 1px solid rgb(168, 127, 24);
+    border-top-left-radius: 10px;
+    border-top-right-radius: 10px;
+    background-color: rgb(6, 10, 13);
 }
-.create-button a:hover {
-    text-decoration: none;
-}
+
+    .sort-options::after {
+        clear: both;
+    }
+
+    .sort-options p {
+        display: inline-block;
+        color: rgb(182, 179, 179);
+    }
+
+    .sort-options a {
+        color: rgb(168, 127, 24);
+    }
+
+        .sort-options a:hover {
+            color: rgba(168, 127, 24, 0.5);
+            text-decoration: none;
+        }
+
 .container {
     width: 90%;
     margin: 100px auto;
@@ -118,9 +279,10 @@ nav {
         opacity: 1;
         left: -1px;
     }
-    .box:hover .box-content a {
-        text-decoration: none;
-    }
+
+        .box:hover .box-content a {
+            text-decoration: none;
+        }
 
     .box .genre-title {
         font-size: 8px;
@@ -139,13 +301,13 @@ nav {
     }
 
     .box .year {
-        font-size: 10px;
+        font-size: 12px;
         font-weight: 400;
         text-transform: uppercase;
         letter-spacing: 1px;
         margin: 0 0 10px;
         display: block;
-        color: rgb(182, 179, 179);
+        color: grey;
     }
 
     .box .icon {
@@ -246,58 +408,68 @@ nav {
         position: relative;
         left: -8px;
     }
+
     .star-text-content a {
         display: block;
         width: 50%;
     }
-    .star-text-content a:hover {
-        text-decoration: none;
-    }
+
+        .star-text-content a:hover {
+            text-decoration: none;
+        }
 
 
-    /* Create-Edit form */
+/* Create-Edit form */
 .breadcrumb {
     margin: 30px 0;
     background: transparent;
 }
-.breadcrumb a {
-    color: rgb(168, 127, 24);
-}
+
+    .breadcrumb a {
+        color: rgb(168, 127, 24);
+    }
 
 .create-form {
     font-size: 20px;
     color: gray;
 }
-.create-form input {
-    background: transparent;
-    outline: none;
-    border: 0;
-    border-radius: 0;
-    border-bottom: 2px solid rgb(168, 127, 24);
-    font-size: 17px;
-}
-.create-form textarea {
-    background: rgba(20,40,50,1);
-    outline: none;
-    border: 0;
-    font-size: 17px;
-}
-.create-form input:focus {
-    opacity: 1;
-    box-shadow: none;
-}
+
+    .create-form input {
+        background: transparent;
+        outline: none;
+        border: 0;
+        border-radius: 0;
+        border-bottom: 2px solid rgb(168, 127, 24);
+        font-size: 17px;
+    }
+
+    .create-form textarea {
+        background: rgba(20,40,50,1);
+        outline: none;
+        border: 0;
+        font-size: 17px;
+    }
+
+    .create-form input:focus {
+        opacity: 1;
+        box-shadow: none;
+    }
+
 .form-position {
     width: 35%;
     margin: 0 auto 0 20%;
 }
+
 .form-left {
     width: 45%;
     float: left;
 }
+
 .form-right {
     width: 45%;
     float: right;
 }
+
 .create-form select {
     background-color: transparent;
     border: none;
@@ -305,16 +477,19 @@ nav {
     border-bottom: 2px solid rgb(168, 127, 24);
     border-radius: 0;
 }
-.create-form select:focus {
-    box-shadow: none;
-    background-color: transparent;
-}
+
+    .create-form select:focus {
+        box-shadow: none;
+        background-color: transparent;
+    }
+
 .create-form .btn {
     background-color: rgb(168, 127, 24);
     color: white;
     margin-top: 10px;
     padding: 5px 30px;
 }
+
 .form-group {
     margin-bottom: 50px;
 }
@@ -380,50 +555,62 @@ nav {
     -ms-transform: rotate(45deg);
     transform: rotate(45deg);
 }
+
 .star-form-margin {
     margin-top: 50px;
 }
+
 .form-group span {
     font-weight: bold;
 }
 
+.text-danger {
+    font-size: 14px;
+}
 
 /* Details */
 .details-container {
     color: grey;
 }
+
 .details-title {
     font-size: 30px;
     margin-bottom: 20px;
     width: 20%;
 }
+
 .details-img {
     height: 300px;
     width: 230px;
     float: left;
 }
-.details-img img {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-}
+
+    .details-img img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+    }
+
 .details-info {
     width: 70%;
     float: left;
     margin-top: 30px;
     font-size: 16px;
 }
+
 .details-cast-img {
     width: 130px;
     height: 170px;
     float: left;
     margin: 10px;
 }
-.details-cast-img img {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-}
+
+    .details-cast-img img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+    }
+
 .details-cast h5 {
     font-size: 20px;
     color: grey;
@@ -431,15 +618,18 @@ nav {
     padding: 10px;
     border-bottom: 1px solid rgb(168, 127, 24);
 }
+
 .details-cast h6 {
     font-size: 15px;
     color: rgb(168, 127, 24);
     padding: 5px;
 }
+
 .details-cast-img:hover a, .details-cast-img:hover h6 {
     text-decoration: none;
-    color: rgba(168, 127, 24, 0.5); 
+    color: rgba(168, 127, 24, 0.5);
 }
+
 .details-cast {
     margin-bottom: 300px;
 }
@@ -449,32 +639,38 @@ nav {
     color: grey;
     width: 100%;
 }
-.details-reviews h5 {
-    font-size: 20px;
-    color: grey;
-    margin-top: 80px;
-    margin-bottom: 50px;
-    padding: 10px;
-    border-bottom: 1px solid rgb(168, 127, 24);
-}
+
+    .details-reviews h5 {
+        font-size: 20px;
+        color: grey;
+        margin-top: 80px;
+        margin-bottom: 50px;
+        padding: 10px;
+        border-bottom: 1px solid rgb(168, 127, 24);
+    }
+
 .details-review-new {
     width: 50%;
     float: left;
     position: relative;
-    left: 3%; 
+    left: 3%;
 }
+
 .details-reviews-list {
     float: left;
     width: 40%;
 }
+
 .review-username {
     color: grey;
     font-size: 15px;
     font-weight: bold;
 }
+
 .review-date {
-    float: right ;
+    float: right;
 }
+
 .one-review {
     margin-bottom: 8px;
     background-color: rgba(0, 0, 0, 0.3);

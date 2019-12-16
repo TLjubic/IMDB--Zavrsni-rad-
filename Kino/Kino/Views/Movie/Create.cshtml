@@ -1,17 +1,10 @@
-﻿@model Kino.Models.Kino.MovieStarModel
+﻿@model Kino.Models.Kino.MovieModel.MovieStarModel
 
 @{
     ViewData["Title"] = "Create";
 }
 
-<head>
-    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.css" />
-    <link rel="stylesheet" href="~/css/style.css" />
-    <link href='https://fonts.googleapis.com/css?family=Raleway:400,800,300' rel='stylesheet' type='text/css'>
-    <script src="https://kit.fontawesome.com/a076d05399.js"></script>
-</head>
-
-<ol class="breadcrumb">
+<ol class="breadcrumb" style="background-color: transparent;">
     <li><a asp-action="Index">Movies</a></li>
     <li class="active">Create movie</li>
 </ol>
@@ -41,18 +34,19 @@
                 <span asp-validation-for="Movie.Description" class="text-danger"></span>
             </div>
             <div class="form-group">
-                <label asp-for="Image" class="control-label custom-file-upload"></label>
+                <label asp-for="Multimedia.Image" class="control-label custom-file-upload"></label>
                 <div class="custom-file">
-                    <input asp-for="Image" class="form-control" />
+                    <input asp-for="Multimedia.Image" class="form-control" />
                 </div>
             </div>
 
-            
+
 
             <div class="form-group">
                 <label class="control-label">Director</label>
                 <select asp-for="Movie.DirectorId" class="select-picker form-control"
                         placeholder="" asp-items="ViewBag.PossibleDirectors"></select>
+                <span asp-validation-for="Movie.DirectorId" class="text-danger"></span>
             </div>
 
             <div class="form-group">
@@ -63,7 +57,7 @@
                             <tr>
                                 @{
                                     int cnt = 0;
-                                    List<Kino.Models.Kino.MovieGenreModel> genres = ViewBag.GenresMovieNew;
+                                    List<Kino.Models.Kino.MovieModel.MovieGenreModel> genres = ViewBag.GenresMovieNew;
 
                                     foreach (var genre in genres)
                                     {
@@ -103,10 +97,13 @@
                     <input type="submit" value="Create" class="btn btn-default" />
                 </div>
             </form>
+        </div>
     </div>
-</div>
 
-<div>
-    <a asp-action="Index">Back to List</a>
-</div>
+    <div>
+        <a asp-action="Index">Back to List</a>
+    </div>
 
+    @section Scripts {
+        @await Html.PartialAsync("_ValidationScriptsPartial")
+    }

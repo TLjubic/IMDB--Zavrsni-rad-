@@ -18,10 +18,10 @@ namespace Model
         public string LastName { get; set; }
 
         [DataType(DataType.Date)]
-        [DisplayFormat(DataFormatString = "{0:yyyy/MM/dd}", ApplyFormatInEditMode = true)]
+        [DisplayFormat(DataFormatString = "{0:yyyy-MM-dd}", ApplyFormatInEditMode = true)]
         public DateTime Birth { get; set; }
 
-        public string Img { get; set; }
+        public string ImageUrl { get; set; }
         //public double Rating { get; set; }
 
         public string Description { get; set; }

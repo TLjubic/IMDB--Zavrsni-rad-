@@ -203,7 +203,7 @@ namespace DAL.Migrations
                     b.Property<string>("FirstName")
                         .IsRequired();
 
-                    b.Property<string>("Img");
+                    b.Property<string>("ImageUrl");
 
                     b.Property<string>("LastName")
                         .IsRequired();
@@ -247,7 +247,7 @@ namespace DAL.Migrations
 
                     b.Property<int>("DirectorId");
 
-                    b.Property<string>("Img");
+                    b.Property<string>("ImageUrl");
 
                     b.Property<DateTime>("ReleaseDate");
 
@@ -325,7 +325,7 @@ namespace DAL.Migrations
                     b.Property<string>("FirstName")
                         .IsRequired();
 
-                    b.Property<string>("Img");
+                    b.Property<string>("ImageUrl");
 
                     b.Property<string>("LastName")
                         .IsRequired();
@@ -343,7 +343,7 @@ namespace DAL.Migrations
 
                     b.Property<string>("Description");
 
-                    b.Property<string>("Img");
+                    b.Property<string>("ImageUrl");
 
                     b.Property<int>("NumberOfEpisode");
 

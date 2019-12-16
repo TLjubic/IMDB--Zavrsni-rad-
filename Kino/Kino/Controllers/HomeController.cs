@@ -5,14 +5,45 @@ using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Kino.Models;
+using DAL;
+using Kino.Models.Kino;
+using Microsoft.EntityFrameworkCore;
+using Model;
 
 namespace Kino.Controllers
 {
     public class HomeController : Controller
     {
-        public IActionResult Index()
+
+        private readonly KinoDb _context;
+
+        public HomeController(KinoDb context)
         {
-            return View();
+            _context = context;
+        }
+
+        // GET: Movie
+        public async Task<IActionResult> Index()
+        {
+            var viewModel = new ViewModel();
+
+            viewModel.ListOfMovies = await _context.Movies
+                .AsNoTracking()
+                .ToListAsync();
+
+            viewModel.ListOfTVShows = await _context.TVShows
+                .AsNoTracking()
+                .ToListAsync();
+
+            viewModel.ListOfStars = await _context.Stars
+                .AsNoTracking()
+                .ToListAsync();
+
+            viewModel.ListOfDirectors = await _context.Directors
+                .AsNoTracking()
+                .ToListAsync();
+
+            return View(viewModel);
         }
 
         public IActionResult About()
@@ -38,6 +69,20 @@ namespace Kino.Controllers
         public IActionResult Error()
         {
             return View(new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
+        }
+
+        public void SetItemsToSearch()
+        {
+
+            var movies = _context.Movies
+                .Include(g => g.ListOfGenres)
+                    .ThenInclude(g => g.Genre)
+                .Include(s => s.ListOfStars)
+                    .ThenInclude(s => s.Star)
+                .Include(i => i.Director);
+                
+
+            ViewBag.Result = movies;
         }
     }
 }

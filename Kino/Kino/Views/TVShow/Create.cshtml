@@ -1,17 +1,11 @@
-﻿@model Kino.Models.Kino.TVShowStarModel
+﻿@model Kino.Models.Kino.TVShowModel.TVShowStarModel
 
 @{
     ViewData["Title"] = "Create";
 }
 
-<head>
-    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.css" />
-    <link rel="stylesheet" href="~/css/style.css" />
-    <link href='https://fonts.googleapis.com/css?family=Raleway:400,800,300' rel='stylesheet' type='text/css'>
-    <script src="https://kit.fontawesome.com/a076d05399.js"></script>
-</head>
 
-<ol class="breadcrumb">
+<ol class="breadcrumb" style="background-color: transparent;">
     <li><a asp-action="Index">TV Shows</a></li>
     <li class="active">Create TV show</li>
 </ol>
@@ -42,9 +36,9 @@
                 <span asp-validation-for="TVShow.Description" class="text-danger"></span>
             </div>
             <div class="form-group">
-                <label asp-for="Image" class="control-label"></label>
+                <label asp-for="Multimedia.Image" class="control-label"></label>
                 <div class="custom-file">
-                    <input asp-for="Image" class="form-control custom-file-input" />
+                    <input asp-for="Multimedia.Image" class="form-control custom-file-input" />
                 </div>
             </div>
 
@@ -56,7 +50,7 @@
                         <tr>
                             @{
                                 int cnt = 0;
-                                List<Kino.Models.Kino.TVShowGenreModel> genres = ViewBag.GenresTVShowNew;
+                                List<Kino.Models.Kino.TVShowModel.TVShowGenreModel> genres = ViewBag.GenresTVShowNew;
 
                                 foreach (var genre in genres)
                                 {
@@ -101,3 +95,7 @@
     <a asp-action="Index">Back to List</a>
 </div>
 
+
+@section Scripts {
+        @await Html.PartialAsync("_ValidationScriptsPartial")
+    }

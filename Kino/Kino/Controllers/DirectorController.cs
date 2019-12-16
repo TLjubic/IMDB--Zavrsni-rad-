@@ -10,11 +10,14 @@ using Model;
 using Microsoft.AspNetCore.Hosting;
 using Kino.Models.Kino;
 using System.IO;
+using Kino.Models.Kino.DirectorModel;
 
 namespace Kino.Controllers
 {
     public class DirectorController : Controller
     {
+        public string errorMessage = "Director is not available!";
+
         private readonly KinoDb _context;
         private IHostingEnvironment _hostingEnvironment;
 
@@ -25,34 +28,74 @@ namespace Kino.Controllers
         }
 
         // GET: Director
-        public async Task<IActionResult> Index()
+        public async Task<IActionResult> Index(string sortOrder)
         {
-            return View(await _context.Directors.ToListAsync());
+            var viewModel = new DirectorViewModel();
+
+            ViewData["NameSortParm"] = String.IsNullOrEmpty(sortOrder) ? "name_desc" : "";
+            ViewData["DateSortParm"] = sortOrder == "Date" ? "date_desc" : "Date";
+
+            viewModel.Directors = await _context.Directors.ToListAsync();
+
+            switch (sortOrder)
+            {
+                case "name_desc":
+                    viewModel.Directors = viewModel.Directors.OrderByDescending(s => s.FullName);
+                    break;
+                case "Date":
+                    viewModel.Directors = viewModel.Directors.OrderBy(s => s.Birth);
+                    break;
+                case "date_desc":
+                    viewModel.Directors = viewModel.Directors.OrderByDescending(s => s.Birth);
+                    break;
+                default:
+                    viewModel.Directors = viewModel.Directors.OrderBy(s => s.FullName);
+                    break;
+            }
+
+
+            MenuItems(viewModel);
+
+            return View(viewModel);
         }
 
         // GET: Director/Details/5
         public async Task<IActionResult> Details(int? id)
         {
-            if (id == null)
+            if (id != null)
             {
-                return NotFound();
+
+                var viewModel = new DirectorViewModel();
+
+                viewModel.Director = await _context.Directors
+                    .Include(d => d.ListOfMovies)
+                    .FirstOrDefaultAsync(m => m.DirectorId == id);
+
+                if (viewModel.Director == null)
+                {
+                    TempData["Message"] = errorMessage;
+                    return RedirectToAction(nameof(Index));
+                }
+
+                MenuItems(viewModel);
+
+                return View(viewModel);
             }
 
-            var director = await _context.Directors
-                .Include(d => d.ListOfMovies)
-                .FirstOrDefaultAsync(m => m.DirectorId == id);
-            if (director == null)
-            {
-                return NotFound();
-            }
+            TempData["Message"] = errorMessage;
+            return RedirectToAction(nameof(Index));
 
-            return View(director);
         }
+
 
         // GET: Director/Create
         public IActionResult Create()
         {
-            return View();
+            var viewModel = new DirectorViewModel();
+
+            MenuItems(viewModel);
+
+            return View(viewModel);
         }
 
         // POST: Director/Create
@@ -60,45 +103,48 @@ namespace Kino.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create(DirectorViewModel directorViewModel)
         {
-            Director director = directorViewModel.Director;
 
             if (ModelState.IsValid)
             {
 
-                string fileName = null;
+                Director director = directorViewModel.Director;
 
-                if (directorViewModel.Image != null)
+                if (directorViewModel.Multimedia.Image != null)
                 {
-                    string uploadFile = Path.Combine(_hostingEnvironment.WebRootPath, "images");
-                    fileName = Guid.NewGuid().ToString() + "_" + directorViewModel.Image.FileName;
-                    string filePath = Path.Combine(uploadFile, fileName);
-                    directorViewModel.Image.CopyTo(new FileStream(filePath, FileMode.Create));
-                    director.Img = fileName;
+                    AddImage(director, directorViewModel);
                 }
 
                 _context.Add(director);
                 await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
             }
+
+            MenuItems(directorViewModel);
+
             return View(directorViewModel);
         }
 
         // GET: Director/Edit/5
         public async Task<IActionResult> Edit(int? id)
         {
-            if (id == null)
+            if (id != null)
             {
-                return NotFound();
+                var viewModel = new DirectorViewModel();
+
+                MenuItems(viewModel);
+
+                viewModel.Director = await _context.Directors.FindAsync(id);
+                if (viewModel.Director == null)
+                {
+                    TempData["Message"] = errorMessage;
+                    return RedirectToAction(nameof(Index));
+                }
+                return View(viewModel);
             }
 
-            var viewModel = new DirectorViewModel();
+            TempData["Message"] = errorMessage;
+            return RedirectToAction(nameof(Index));
 
-            viewModel.Director = await _context.Directors.FindAsync(id);
-            if (viewModel.Director == null)
-            {
-                return NotFound();
-            }
-            return View(viewModel);
         }
 
         // POST: Director/Edit/5
@@ -108,23 +154,18 @@ namespace Kino.Controllers
         {
             if (id != directorViewModel.Director.DirectorId)
             {
-                return NotFound();
+                TempData["Message"] = errorMessage;
+                return RedirectToAction(nameof(Index));
             }
-
-            Director director = directorViewModel.Director;
 
             if (ModelState.IsValid)
             {
 
-                string fileName = null;
+                Director director = directorViewModel.Director;
 
-                if (directorViewModel.Image != null)
+                if (directorViewModel.Multimedia.Image != null)
                 {
-                    string uploadFile = Path.Combine(_hostingEnvironment.WebRootPath, "images");
-                    fileName = Guid.NewGuid().ToString() + "_" + directorViewModel.Image.FileName;
-                    string filePath = Path.Combine(uploadFile, fileName);
-                    directorViewModel.Image.CopyTo(new FileStream(filePath, FileMode.Create));
-                    director.Img = fileName;
+                    AddImage(director, directorViewModel);
                 }
 
                 try
@@ -136,34 +177,41 @@ namespace Kino.Controllers
                 {
                     if (!DirectorExists(director.DirectorId))
                     {
-                        return NotFound();
+                        TempData["Message"] = errorMessage;
+                        return RedirectToAction(nameof(Index));
                     }
                     else
                     {
                         throw;
                     }
                 }
-                return RedirectToAction(nameof(Index));
+                return RedirectToAction("Details", "Director", new { id = director.DirectorId });
             }
+
+            MenuItems(directorViewModel);
+
             return View(directorViewModel);
         }
 
         // GET: Director/Delete/5
         public async Task<IActionResult> Delete(int? id)
         {
-            if (id == null)
+            if (id != null)
             {
-                return NotFound();
-            }
-
-            var director = await _context.Directors
+                var director = await _context.Directors
                 .FirstOrDefaultAsync(m => m.DirectorId == id);
-            if (director == null)
-            {
-                return NotFound();
+                if (director == null)
+                {
+                    TempData["Message"] = errorMessage;
+                    return RedirectToAction(nameof(Index));
+                }
+
+                return View(director);
             }
 
-            return View(director);
+            TempData["Message"] = errorMessage;
+            return RedirectToAction(nameof(Index));
+
         }
 
         // POST: Director/Delete/5
@@ -181,5 +229,25 @@ namespace Kino.Controllers
         {
             return _context.Directors.Any(e => e.DirectorId == id);
         }
+
+
+        // Add Image
+        public void AddImage(Director director, DirectorViewModel directorViewModel)
+        {
+            director.ImageUrl = directorViewModel.Multimedia.AddingImageUrl(directorViewModel.Multimedia.Image, _hostingEnvironment);
+        }
+
+
+        // Fill menu items
+        public void MenuItems(DirectorViewModel viewModel)
+        {
+            ViewModel model = new ViewModel();
+            model = model.fillMenuItems(_context, model);
+            viewModel.ListOfMovies = model.ListOfMovies;
+            viewModel.ListOfTVShows = model.ListOfTVShows;
+            viewModel.ListOfStars = model.ListOfStars;
+            viewModel.ListOfDirectors = model.ListOfDirectors;
+        }
+
     }
 }

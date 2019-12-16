@@ -7,22 +7,22 @@ namespace DAL.Migrations
         protected override void Up(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.AddColumn<string>(
-                name: "Img",
+                name: "ImageUrl",
                 table: "TVShows",
                 nullable: true);
 
             migrationBuilder.AddColumn<string>(
-                name: "Img",
+                name: "ImageUrl",
                 table: "Stars",
                 nullable: true);
 
             migrationBuilder.AddColumn<string>(
-                name: "Img",
+                name: "ImageUrl",
                 table: "Movies",
                 nullable: true);
 
             migrationBuilder.AddColumn<string>(
-                name: "Img",
+                name: "ImageUrl",
                 table: "Directors",
                 nullable: true);
         }
@@ -30,19 +30,19 @@ namespace DAL.Migrations
         protected override void Down(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.DropColumn(
-                name: "Img",
+                name: "ImageUrl",
                 table: "TVShows");
 
             migrationBuilder.DropColumn(
-                name: "Img",
+                name: "ImageUrl",
                 table: "Stars");
 
             migrationBuilder.DropColumn(
-                name: "Img",
+                name: "ImageUrl",
                 table: "Movies");
 
             migrationBuilder.DropColumn(
-                name: "Img",
+                name: "ImageUrl",
                 table: "Directors");
         }
     }

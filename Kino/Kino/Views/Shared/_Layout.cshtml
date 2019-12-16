@@ -1,4 +1,5 @@
-﻿<!DOCTYPE html>
+﻿
+<!DOCTYPE html>
 <html>
 <head>
     <meta charset="utf-8" />
@@ -16,23 +17,39 @@
         <link rel="stylesheet" href="~/css/site.min.css" asp-append-version="true" />
     </environment>
     
-        <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.css" />
         <link rel="stylesheet" href="~/css/style.css" />
         <link href='https://fonts.googleapis.com/css?family=Raleway:400,800,300' rel='stylesheet' type='text/css'>
         <script src="https://kit.fontawesome.com/a076d05399.js"></script>
-    
+        <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script>
 </head>
 <body>
     <nav>
-        <ul>
+        <ul class="primary">
             <li><span><a asp-area="" asp-controller="Home" asp-action="Index">IMDb</a></span></li>
-            <li><a asp-area="" asp-controller="Movie" asp-action="Index">Movies</a></li>
-            <li><a asp-area="" asp-controller="Star" asp-action="Index">Stars</a></li>
-            <li><a asp-area="" asp-controller="TVShow" asp-action="Index">TV shows</a></li>
-            <li><a asp-area="" asp-controller="Director" asp-action="Index">Directors</a></li>
+            <li>
+                <a asp-area="" asp-controller="Movie" asp-action="Index">Movies <i class="fas fa-sort-down"></i></a>
+                <partial name="_DropdownMovie.cshtml" />
+            </li>
+            <li>
+                <a asp-area="" asp-controller="Star" asp-action="Index">Stars <i class="fas fa-sort-down"></i></a>
+                <partial name="_DropdownStar.cshtml" />
+            </li>
+            <li>
+                <a asp-area="" asp-controller="TVShow" asp-action="Index">TV shows <i class="fas fa-sort-down"></i></a>
+                <partial name="_DropdownTVShow.cshtml" />
+            </li>
+            
+            <li>
+                <a asp-area="" asp-controller="Director" asp-action="Index">Directors <i class="fas fa-sort-down"></i></a>
+                <partial name="_DropdownDirector.cshtml" />
+            </li>
+
+            @await Html.PartialAsync("_MenuSearch.cshtml");
+
             <partial name="_LoginPartial.cshtml" />
-        </ul>   
+        </ul> 
     </nav>
+
 
     <partial name="_CookieConsentPartial" />
 

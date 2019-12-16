@@ -1,17 +1,18 @@
-﻿@model IEnumerable<Model.Director>
+﻿@model Kino.Models.Kino.DirectorModel.DirectorViewModel
 
 @{
     ViewData["Title"] = "Index";
 }
 
-<head>
-    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.css" />
-    <link rel="stylesheet" href="~/css/style.css" />
-    <link href='https://fonts.googleapis.com/css?family=Raleway:400,800,300' rel='stylesheet' type='text/css'>
-    <script src="https://kit.fontawesome.com/a076d05399.js"></script>
-</head>
-
 <body>
+
+    <div style="color: grey; font-size: 15px; font-weight: bold;">@TempData["Message"]</div>
+
+    <div class="sort-options">
+        <p>Sort by:</p>
+        <a asp-controller="Director" asp-action="Index" asp-route-sortOrder="@ViewData["NameSortParm"]">Name</a>
+        <a asp-controller="Director" asp-action="Index" asp-route-sortOrder="@ViewData["DateSortParm"]">Birth</a>
+    </div>
 
     <div class="container">
 
@@ -20,9 +21,9 @@
         </p>
 
 
-        @foreach (var item in Model)
+        @foreach (var item in Model.Directors)
         {
-            var imgPath = "~/Images/" + (item.Img ?? "banner1.svg");
+            var imgPath = "~/Images/" + (item.ImageUrl ?? "NoImage.png");
 
             <div class="star-index">
                 <div class="star-image">
@@ -31,18 +32,18 @@
                 <div class="star-text">
                     <div class="star-text-content">
                         <h5><a asp-action="Details" asp-route-id="@item.DirectorId">@item.FullName</a></h5>
-                        @if (item.Description.Length > 150)
+                        @if (item.Description != null && item.Description.Length > 150)
                         {
                             <p>
                                 @Html.Raw(item.Description.Substring(0, 150) + "...")
-                            <a asp-action="Details" asp-route-id="@item.DirectorId">See more</a>
-                        </p>
+                                <a asp-action="Details" asp-route-id="@item.DirectorId">See more</a>
+                            </p>
 
-                    }
-                    else
-                    {
-                        <p>@item.Description</p>
-                    }
+                        }
+                        else
+                        {
+                            <p>@item.Description</p>
+                        }
                     </div>
                 </div>
             </div>

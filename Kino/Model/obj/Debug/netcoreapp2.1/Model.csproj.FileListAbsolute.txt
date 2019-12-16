@@ -4,6 +4,6 @@ C:\Users\Tomislav\source\repos\Kino\Model\obj\Debug\netcoreapp2.1\Model.csproj.C
 C:\Users\Tomislav\source\repos\Kino\Model\obj\Debug\netcoreapp2.1\Model.AssemblyInfoInputs.cache
 C:\Users\Tomislav\source\repos\Kino\Model\obj\Debug\netcoreapp2.1\Model.AssemblyInfo.cs
 C:\Users\Tomislav\source\repos\Kino\Model\bin\Debug\netcoreapp2.1\Model.pdb
-C:\Users\Tomislav\source\repos\Kino\Model\obj\Debug\netcoreapp2.1\Model.csprojAssemblyReference.cache
 C:\Users\Tomislav\source\repos\Kino\Model\obj\Debug\netcoreapp2.1\Model.dll
 C:\Users\Tomislav\source\repos\Kino\Model\obj\Debug\netcoreapp2.1\Model.pdb
+C:\Users\Tomislav\source\repos\Kino\Model\obj\Debug\netcoreapp2.1\Model.csprojAssemblyReference.cache

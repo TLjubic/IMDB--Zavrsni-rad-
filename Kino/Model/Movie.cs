@@ -13,14 +13,15 @@ namespace Model
         [Required]
         public string Title { get; set; }
 
+        [Required]
         [Display(Name = "Release Date")]
         [DataType(DataType.Date)]
-        [DisplayFormat(DataFormatString = "{0:yyyy/MM/dd}", ApplyFormatInEditMode = true)]
+        [DisplayFormat(DataFormatString = "{0:yyyy-MM-dd}", ApplyFormatInEditMode = true)]
         public DateTime ReleaseDate { get; set; }
 
         public int Runtime { get; set; }
 
-        public string Img { get; set; }
+        public string ImageUrl { get; set; }
         //public string Video { get; set; }
 
         //public double Rating { get; set; }

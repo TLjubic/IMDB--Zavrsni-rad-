@@ -1,17 +1,10 @@
-﻿@model Kino.Models.Kino.DirectorViewModel
+﻿@model Kino.Models.Kino.DirectorModel.DirectorViewModel
 
 @{
     ViewData["Title"] = "Edit";
 }
 
-<head>
-    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.css" />
-    <link rel="stylesheet" href="~/css/style.css" />
-    <link href='https://fonts.googleapis.com/css?family=Raleway:400,800,300' rel='stylesheet' type='text/css'>
-    <script src="https://kit.fontawesome.com/a076d05399.js"></script>
-</head>
-
-<ol class="breadcrumb">
+<ol class="breadcrumb" style="background-color: transparent;">
     <li><a asp-action="Index">Directors</a></li>
     <li class="active">Edit director</li>
 </ol>
@@ -43,9 +36,15 @@
                 <span asp-validation-for="Director.Description" class="text-danger"></span>
             </div>
             <div class="form-group">
-                <label asp-for="Image" class="control-label"></label>
+                <label asp-for="Director.ImageUrl" class="control-label"></label>
                 <div class="custom-file">
-                    <input asp-for="Image" class="form-control custom-file-input" />
+                    <input asp-for="Director.ImageUrl" class="form-control custom-file-input" />
+                </div>
+            </div>
+            <div class="form-group">
+                <label asp-for="Multimedia.Image" class="control-label"></label>
+                <div class="custom-file">
+                    <input asp-for="Multimedia.Image" class="form-control custom-file-input" />
                 </div>
             </div>
             <div class="form-group">
