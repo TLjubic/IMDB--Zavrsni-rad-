@@ -1,17 +1,10 @@
-﻿@model Kino.Models.Kino.MovieEditModel
+﻿@model Kino.Models.Kino.MovieModel.MovieEditModel
 
 @{
     ViewData["Title"] = "Edit";
 }
 
-<head>
-    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.css" />
-    <link rel="stylesheet" href="~/css/style.css" />
-    <link href='https://fonts.googleapis.com/css?family=Raleway:400,800,300' rel='stylesheet' type='text/css'>
-    <script src="https://kit.fontawesome.com/a076d05399.js"></script>
-</head>
-
-<ol class="breadcrumb">
+<ol class="breadcrumb" style="background-color: transparent;">
     <li><a asp-action="Index">Movies</a></li>
     <li class="active">Edit movie</li>
 </ol>
@@ -43,9 +36,16 @@
             </div>
 
             <div class="form-group">
-                <label asp-for="Image" class="control-label"></label>
+                <label asp-for="Movie.ImageUrl" class="control-label"></label>
                 <div class="custom-file">
-                    <input asp-for="Image" class="form-control custom-file-input" />
+                    <input asp-for="Movie.ImageUrl" class="form-control custom-file-input" />
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label asp-for="Multimedia.Image" class="control-label"></label>
+                <div class="custom-file">
+                    <input asp-for="Multimedia.Image" class="form-control custom-file-input" />
                 </div>
             </div>
 
@@ -53,41 +53,42 @@
                 <label class="control-label">Director</label>
                 <select asp-for="Movie.DirectorId" class="select-picker form-control"
                         placeholder="" asp-items="ViewBag.PossibleDirectors"></select>
+                <span asp-validation-for="Movie.DirectorId" class="text-danger"></span>
             </div>
 
             <div class="form-group">
                 <div class="form-checkbox">
-                <span>Genre</span>
-                <div class="col-md-offset-2 col-md-10">
-                    <table>
-                        <tr>
-                            @{
-                                int cnt = 0;
-                                List<Kino.Models.Kino.MovieGenreModel> genres = ViewBag.GenresMovie;
+                    <span>Genre</span>
+                    <div class="col-md-offset-2 col-md-10">
+                        <table>
+                            <tr>
+                                @{
+                                    int cnt = 0;
+                                    List<Kino.Models.Kino.MovieModel.MovieGenreModel> genres = ViewBag.GenresMovie;
 
-                                foreach (var genre in genres)
-                                {
-                                    if (cnt++ % 3 == 0)
+                                    foreach (var genre in genres)
                                     {
-                                    @:</tr><tr>
+                                        if (cnt++ % 3 == 0)
+                                        {
+                                        @:</tr><tr>
+                                        }
+                                        @:<td>
+                                            <label class="container-checkbox">
+                                                <input class="form-checkbox"
+                                                       type="checkbox"
+                                                       name="selectedGenres"
+                                                       value="@genre.GenreId"
+                                                       @(Html.Raw(genre.Check ? "checked=\"checked\"" : "")) />
+                                                @genre.Title
+                                                <span class="checkmark"></span>
+                                            </label>
+                                        @:</td>
                                     }
-                                    @:<td>
-                                        <label class="container-checkbox">
-                                            <input class="form-checkbox"
-                                                   type="checkbox"
-                                                   name="selectedGenres"
-                                                   value="@genre.GenreId"
-                                                   @(Html.Raw(genre.Check ? "checked=\"checked\"" : "")) />
-                                            @genre.Title
-                                            <span class="checkmark"></span>
-                                        </label>
-                                    @:</td>
+                                @:</tr>
                                 }
-                            @:</tr>
-                            }
 
-                        </table>
-                    </div>
+                            </table>
+                        </div>
                     </div>
                 </div>
 
@@ -106,10 +107,12 @@
         </div>
     </div>
 
-<div>
-    <a asp-action="Index">Back to List</a>
-    <a asp-action="Delete" asp-route-id="@Model.Movie.MovieId">Delete</a>
-</div>
+    <div>
+        <a asp-action="Index">Back to List</a>
+        <a asp-action="Delete" asp-route-id="@Model.Movie.MovieId">Delete</a>
+    </div>
 
 
-
+    @section Scripts {
+        @await Html.PartialAsync("_ValidationScriptsPartial")
+    }

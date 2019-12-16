@@ -13,14 +13,14 @@ namespace Model
         public string Title { get; set; }
 
         [DataType(DataType.Date)]
-        [DisplayFormat(DataFormatString = "{0:yyyy/MM/dd}", ApplyFormatInEditMode = true)]
+        [DisplayFormat(DataFormatString = "{0:yyyy-MM-dd}", ApplyFormatInEditMode = true)]
         [Display(Name = "Release Date")]
         public DateTime ReleaseDate { get; set; }
 
         [Display(Name = "Number of episodes")]
         public int NumberOfEpisode { get; set; }
 
-        public string Img { get; set; }
+        public string ImageUrl { get; set; }
         //public string Video { get; set; }
 
         //public double Rating { get; set; }

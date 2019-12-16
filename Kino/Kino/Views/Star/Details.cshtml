@@ -1,18 +1,12 @@
-﻿@model Model.Star
+﻿@model Kino.Models.Kino.StarModel.StarViewModel
 
 @{
     ViewData["Title"] = "Details";
-    var imgPath = "~/Images/" + (Model.Img ?? "banner1.svg");
+    var imgPath = "~/Images/" + (Model.Star.ImageUrl ?? "NoImage.png");
 }
 
-<head>
-    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.css" />
-    <link rel="stylesheet" href="~/css/style.css" />
-    <link href='https://fonts.googleapis.com/css?family=Raleway:400,800,300' rel='stylesheet' type='text/css'>
-    <script src="https://kit.fontawesome.com/a076d05399.js"></script>
-</head>
 
-<ol class="breadcrumb">
+<ol class="breadcrumb" style="background-color: transparent;">
     <li><a asp-action="Index">Stars</a></li>
     <li class="active">Details</li>
 </ol>
@@ -21,7 +15,7 @@
 <div class="details-container">
 
     <div class="details-title">
-        @Html.DisplayFor(model => model.FullName)
+        @Html.DisplayFor(model => model.Star.FullName)
     </div>
 
     <div class="details-img">
@@ -31,34 +25,34 @@
     <div class="details-info">
         <dl class="dl-horizontal">
             <dt>
-                @Html.DisplayNameFor(model => model.Birth)
+                @Html.DisplayNameFor(model => model.Star.Birth)
             </dt>
             <dd>
-                @Html.DisplayFor(model => model.Birth)
+                @Model.Star.Birth.ToLongDateString()
             </dd>
             <dt>
-                @Html.DisplayNameFor(model => model.Description)
+                @Html.DisplayNameFor(model => model.Star.Description)
             </dt>
             <dd>
-                @Html.DisplayFor(model => model.Description)
+                @Html.DisplayFor(model => model.Star.Description)
             </dd>
         </dl>
     </div>
     <div class="clear"></div>
 </div>
 
-@if (Model.ListOfMovies.Count() > 0)
+@if (Model.Star.ListOfMovies.Count() > 0)
 {
     <div class="details-cast">
 
         <h5>Movies</h5>
 
-        @foreach (var star in Model.ListOfMovies)
+        @foreach (var star in Model.Star.ListOfMovies)
         {
 
             <div class="details-cast-img">
                 <a asp-controller="Movie" asp-action="Details" asp-route-id="@star.Movie.MovieId">
-                    <img src="~/images/@star.Movie.Img">
+                    <img src="~/images/@star.Movie.ImageUrl">
                     <h6>@star.Movie.Title</h6>
                 </a>
             </div>
@@ -69,19 +63,19 @@
 
 <div class="clear"></div>
 
-@if (Model.ListOfTVShows.Count() > 0)
+@if (Model.Star.ListOfTVShows.Count() > 0)
 {
 
     <div class="details-cast">
 
         <h5>TV Shows</h5>
 
-        @foreach (var star in Model.ListOfTVShows)
+        @foreach (var star in Model.Star.ListOfTVShows)
         {
 
             <div class="details-cast-img">
                 <a asp-controller="TVShow" asp-action="Details" asp-route-id="@star.TVShow.TVShowId">
-                    <img src="~/images/@star.TVShow.Img">
+                    <img src="~/images/@star.TVShow.ImageUrl">
                     <h6>@star.TVShow.Title</h6>
                 </a>
             </div>
@@ -93,6 +87,6 @@
     <div class="clear"></div>
 
     <div class="margin-top-footer">
-        <a asp-action="Edit" asp-route-id="@Model.StarId">Edit</a> |
+        <a asp-action="Edit" asp-route-id="@Model.Star.StarId">Edit</a> |
         <a asp-action="Index">Back to List</a>
     </div>

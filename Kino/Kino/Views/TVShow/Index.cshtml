@@ -1,18 +1,18 @@
-﻿@model Kino.Models.Kino.TVIndexModel
+﻿@model Kino.Models.Kino.TVShowModel.TVIndexModel
 
 @{
     ViewData["Title"] = "TVShows";
 }
 
-<head>
-    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.css" />
-    <link rel="stylesheet" href="~/css/style.css" />
-    <link href='https://fonts.googleapis.com/css?family=Raleway:400,800,300' rel='stylesheet' type='text/css'>
-    <script src="https://kit.fontawesome.com/a076d05399.js"></script>
-</head>
-
-
 <body>
+
+    <div style="color: grey; font-size: 15px; font-weight: bold;">@TempData["Message"]</div>
+
+    <div class="sort-options">
+        <p>Sort by:</p>
+        <a asp-controller="TVShow" asp-action="Search" asp-route-sortOrder="@ViewData["NameSortParm"]">Title</a>
+        <a asp-controller="TVShow" asp-action="Search" asp-route-sortOrder="@ViewData["DateSortParm"]">Year</a>
+    </div>
 
     <div class="container">
 
@@ -22,7 +22,7 @@
 
         @foreach (var item in Model.TVShows)
         {
-            var imgPath = "~/Images/" + (item.Img ?? "banner1.svg");
+            var imgPath = "~/Images/" + (item.ImageUrl ?? "NoImage.png");
 
             <div class="box">
                 <a asp-action="Details" asp-route-id="@item.TVShowId">
@@ -38,7 +38,7 @@
                             }
                         </h3>
                         <span class="title">@item.Title</span>
-                        <span class="year">@item.ReleaseDate</span>
+                        <span class="year">@item.ReleaseDate.Year</span>
 
                         <a href="#"><i class="far fa-heart"></i></a>
                         <a href="#"><i class="fa fa-link"></i></a>

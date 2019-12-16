@@ -1,53 +1,56 @@
-﻿@model Kino.Models.Kino.MovieIndexModel
+﻿@model Kino.Models.Kino.MovieModel.MovieIndexModel
 
 @{
     ViewData["Title"] = "Movies";
 }
 
-<head>
-    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.css" />
-    <link rel="stylesheet" href="~/css/style.css" />
-    <link href='https://fonts.googleapis.com/css?family=Raleway:400,800,300' rel='stylesheet' type='text/css'>
-    <script src="https://kit.fontawesome.com/a076d05399.js"></script>
-</head>
 <body>
-    
+
+    <div style="color: grey; font-size: 15px; font-weight: bold;">@TempData["Message"]</div>
+
+    <div class="sort-options">
+        <p>Sort by:</p>
+        <a asp-controller="Movie" asp-action="Search" asp-route-sortOrder="@ViewData["NameSortParm"]">Title</a>
+        <a asp-controller="Movie" asp-action="Search" asp-route-sortOrder="@ViewData["DateSortParm"]">Year</a>
+    </div>
+
     <div class="container">
-        
+
         <p class="create-button">
             <a asp-action="Create">Create New</a>
         </p>
 
+
         @foreach (var item in Model.Movies)
         {
-            var imgPath = "~/Images/" + (item.Img ?? "banner1.svg");
+            var imgPath = "~/Images/" + (item.ImageUrl ?? "NoImage.png");
 
             <div class="box">
-               <a asp-action="Details" asp-route-id="@item.MovieId">
-                    
+                <a asp-action="Details" asp-route-id="@item.MovieId">
+
                     <img src="@imgPath" asp-append-version="true" />
                     <div class="box-content">
                         <h3 class="genre-title">
-                        @{
-                           foreach (var genre in item.ListOfGenres)
-                           {
-                                @genre.Genre.Name @:
-                           }
-                        }
+                            @{
+                                foreach (var genre in item.ListOfGenres)
+                                {
+                                    @genre.Genre.Name @:
+                                }
+                            }
                         </h3>
                         <span class="title">@item.Title</span>
-                        <span class="year">@item.ReleaseDate</span>
-                                
+                        <span class="year">@item.ReleaseDate.Year</span>
+
                         <a href="#"><i class="far fa-heart"></i></a>
                         <a href="#"><i class="fa fa-link"></i></a>
-                                
+
                     </div>
-                    
-               </a>
+
+                </a>
             </div>
         }
 
-    </div>            
+    </div>
 
 </body>
 

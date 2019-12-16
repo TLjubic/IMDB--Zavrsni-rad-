@@ -8,6 +8,7 @@ using Microsoft.EntityFrameworkCore;
 using DAL;
 using Model;
 using Kino.Models.Kino;
+using Kino.Models.Kino.MovieModel;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Hosting;
@@ -17,6 +18,8 @@ namespace Kino.Controllers
 {
     public class MovieController : Controller
     {
+        public string errorMessage = "Movie is not available!";
+
         private readonly KinoDb _context;
         private UserManager<AppUser> _userManager;
         private IHostingEnvironment _hostingEnvironment;
@@ -32,7 +35,7 @@ namespace Kino.Controllers
         public async Task<IActionResult> Index(int? id)
         {
             var viewModel = new MovieIndexModel();
-            
+
             viewModel.Movies = await _context.Movies
                 .Include(g => g.ListOfGenres)
                     .ThenInclude(g => g.Genre)
@@ -41,7 +44,7 @@ namespace Kino.Controllers
                 .Include(i => i.Director)
                 .AsNoTracking()
                 .ToListAsync();
-            
+
             if (id != null)
             {
                 Movie movie = viewModel.Movies.Where(i => i.MovieId == id.Value).Single();
@@ -49,52 +52,139 @@ namespace Kino.Controllers
                 viewModel.Stars = movie.ListOfStars.Select(i => i.Star);
             }
 
+            ViewModel model = new ViewModel();
+            model = model.fillMenuItems(_context, model);
+            viewModel.ListOfMovies = model.ListOfMovies;
+            viewModel.ListOfTVShows = model.ListOfTVShows;
+            viewModel.ListOfStars = model.ListOfStars;
+            viewModel.ListOfDirectors = model.ListOfDirectors;
+
+
             return View(viewModel);
         }
 
         // GET: Movie/Details/5
         public async Task<IActionResult> Details(int? id)
         {
+            if (id != null)
+            {
+                var viewModel = new ReviewDetailMovieModel();
+
+                viewModel.Movie = await _context.Movies
+                    .Include(i => i.ListOfGenres)
+                        .ThenInclude(i => i.Genre)
+                    .Include(i => i.ListOfStars)
+                        .ThenInclude(i => i.Star)
+                    .Include(i => i.Director)
+                    .Include(i => i.ListOfReviews)
+                    .FirstOrDefaultAsync(m => m.MovieId == id);
+
+                if (viewModel.Movie == null)
+                {
+                    TempData["Message"] = errorMessage;
+                    return RedirectToAction(nameof(Index));
+                }
+
+                ViewModel model = new ViewModel();
+                model = model.fillMenuItems(_context, model);
+                viewModel.ListOfMovies = model.ListOfMovies;
+                viewModel.ListOfTVShows = model.ListOfTVShows;
+                viewModel.ListOfStars = model.ListOfStars;
+                viewModel.ListOfDirectors = model.ListOfDirectors;
+
+                return View(viewModel);
+            }
+
+            TempData["Message"] = errorMessage;
+            return RedirectToAction(nameof(Index));
+
+        }
+
+        // GET: Movie/Search/Drama
+        public IActionResult Search(string id, string sortOrder)
+        {
+
+            var viewModel = new MovieIndexModel();
+
+            ViewData["NameSortParm"] = String.IsNullOrEmpty(sortOrder) ? "name_desc" : "";
+            ViewData["DateSortParm"] = sortOrder == "Date" ? "date_desc" : "Date";
+
             if (id == null)
             {
-                return NotFound();
-            }
-
-            var viewModel = new ReviewDetailModel();
-
-            viewModel.Movie = await _context.Movies
-                .Include(i => i.ListOfGenres)
-                    .ThenInclude(i => i.Genre)
-                .Include(i => i.ListOfStars)
-                    .ThenInclude(i => i.Star)
+                viewModel.Movies = _context.Movies
+                .Include(g => g.ListOfGenres)
+                    .ThenInclude(g => g.Genre)
+                .Include(s => s.ListOfStars)
+                    .ThenInclude(s => s.Star)
                 .Include(i => i.Director)
-                .Include(i => i.ListOfReviews)
-                .FirstOrDefaultAsync(m => m.MovieId == id);
-
-            if (viewModel == null)
+                .AsNoTracking()
+                .ToList();
+            }
+            else
             {
-                return NotFound();
+                viewModel.Movies = _context.Movies
+                .Include(g => g.ListOfGenres)
+                    .ThenInclude(g => g.Genre)
+                .Include(s => s.ListOfStars)
+                    .ThenInclude(s => s.Star)
+                .Include(i => i.Director)
+                .Where(i => i.ListOfGenres
+                    .Any(g => g.Genre.Name.Contains(id)))
+                .ToList();
+            }
+            
+
+            switch (sortOrder)
+            {
+                case "name_desc":
+                    viewModel.Movies = viewModel.Movies.OrderByDescending(s => s.Title);
+                    break;
+                case "Date":
+                    viewModel.Movies = viewModel.Movies.OrderBy(s => s.ReleaseDate);
+                    break;
+                case "date_desc":
+                    viewModel.Movies = viewModel.Movies.OrderByDescending(s => s.ReleaseDate);
+                    break;
+                default:
+                    viewModel.Movies = viewModel.Movies.OrderBy(s => s.Title);
+                    break;
             }
 
-            return View(viewModel);
+            ViewModel model = new ViewModel();
+            model = model.fillMenuItems(_context, model);
+            viewModel.ListOfMovies = model.ListOfMovies;
+            viewModel.ListOfTVShows = model.ListOfTVShows;
+            viewModel.ListOfStars = model.ListOfStars;
+            viewModel.ListOfDirectors = model.ListOfDirectors;
+
+            return View("Index", viewModel);
+
         }
 
         // POST: Movie/Details/5
         [Authorize]
         [HttpPost]
-        public async Task<IActionResult> CreateReview(ReviewDetailModel reviewDetailModel)
+        public async Task<IActionResult> CreateReview(ReviewDetailMovieModel reviewDetailModel)
         {
-            var userId = this._userManager.GetUserId(base.User);
-            var userName = this._userManager.GetUserName(base.User);
 
-            MovieReview movieReview = reviewDetailModel.MovieReview;
-            movieReview.MovieId = reviewDetailModel.Movie.MovieId;
-            movieReview.Date = DateTime.Now;
-            movieReview.Username = userName;
-            _context.Add(movieReview);
-            await _context.SaveChangesAsync();
+            if (reviewDetailModel.MovieReview.Body != null && reviewDetailModel.MovieReview.Title != null)
+            {
+                var userId = this._userManager.GetUserId(base.User);
+                var userName = this._userManager.GetUserName(base.User);
 
-            return RedirectToAction(nameof(Index));
+                MovieReview movieReview = reviewDetailModel.MovieReview;
+                movieReview.MovieId = reviewDetailModel.Movie.MovieId;
+                movieReview.Date = DateTime.Now;
+                movieReview.Username = userName;
+
+                _context.Add(movieReview);
+                await _context.SaveChangesAsync();
+
+                TempData["Message"] = "Comment successfully added.";
+                return RedirectToAction("Details", "Movie", new { id = movieReview.MovieId });
+            }
+
+            return RedirectToAction("Details", "Movie", new { id = reviewDetailModel.MovieReview.MovieId });
         }
 
         // GET: Movie/Create
@@ -102,29 +192,31 @@ namespace Kino.Controllers
         {
             FillGenresDataNew();
             FillDropdown();
-            return View();
+
+            var viewModel = new MovieStarModel();
+            ViewModel model = new ViewModel();
+            model = model.fillMenuItems(_context, model);
+            viewModel.ListOfMovies = model.ListOfMovies;
+            viewModel.ListOfTVShows = model.ListOfTVShows;
+            viewModel.ListOfStars = model.ListOfStars;
+            viewModel.ListOfDirectors = model.ListOfDirectors;
+
+            return View(viewModel);
         }
 
         // POST: Movie/Create
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("MovieId,Title,ReleaseDate,Runtime,Description")] 
-            string[] selectedGenres, MovieStarModel movieStarModel)
+        public async Task<IActionResult> Create(string[] selectedGenres, MovieStarModel movieStarModel)
         {
             Movie movie = movieStarModel.Movie;
 
             if (ModelState.IsValid)
             {
 
-                string fileName = null;
-
-                if (movieStarModel.Image != null)
+                if (movieStarModel.Multimedia.Image != null)
                 {
-                    string uploadFile = Path.Combine(_hostingEnvironment.WebRootPath, "images");
-                    fileName = Guid.NewGuid().ToString() + "_" + movieStarModel.Image.FileName;
-                    string filePath = Path.Combine(uploadFile, fileName);
-                    movieStarModel.Image.CopyTo(new FileStream(filePath, FileMode.Create));
-                    movie.Img = fileName;
+                    movie.ImageUrl = movieStarModel.Multimedia.AddingImageUrl(movieStarModel.Multimedia.Image, _hostingEnvironment);
                 }
 
                 _context.Add(movie);
@@ -197,27 +289,42 @@ namespace Kino.Controllers
         // GET: Movie/Edit/5
         public async Task<IActionResult> Edit(int? id)
         {
-            if (id == null)
+            if (id != null)
             {
-                return NotFound();
+                var viewModel = new MovieEditModel();
+
+                viewModel.Movie = await _context.Movies
+                    .Include(i => i.ListOfGenres)
+                        .ThenInclude(i => i.Genre)
+                    .Include(i => i.ListOfStars)
+                        .ThenInclude(i => i.Star)
+                    .Include(i => i.Director)
+                    .AsNoTracking()
+                    .FirstOrDefaultAsync(m => m.MovieId == id);
+
+                if (viewModel.Movie == null)
+                {
+                    TempData["Message"] = errorMessage;
+                    return RedirectToAction(nameof(Index));
+                }
+
+                FillGenresData(viewModel.Movie);
+                this.FillDropdown();
+
+                ViewModel model = new ViewModel();
+                model = model.fillMenuItems(_context, model);
+                viewModel.ListOfMovies = model.ListOfMovies;
+                viewModel.ListOfTVShows = model.ListOfTVShows;
+                viewModel.ListOfStars = model.ListOfStars;
+                viewModel.ListOfDirectors = model.ListOfDirectors;
+
+                return View(viewModel);
             }
 
-            var viewModel = new MovieEditModel();
-
-            viewModel.Movie = await _context.Movies
-                .Include(i => i.ListOfGenres)
-                    .ThenInclude(i => i.Genre)
-                .Include(i => i.ListOfStars)
-                    .ThenInclude(i => i.Star)
-                .Include(i => i.Director)
-                .AsNoTracking()
-                .FirstOrDefaultAsync(m => m.MovieId == id);
-
-            FillGenresData(viewModel.Movie);
-            this.FillDropdown();
-
-            return View(viewModel);
+            TempData["Message"] = errorMessage;
+            return RedirectToAction(nameof(Index));
         }
+
 
         
         // POST: Movie/Edit/5
@@ -225,66 +332,84 @@ namespace Kino.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(int? id, MovieEditModel movieEditModel, string[] selectedGenres, int[] selectedStars)
         {
-            if (id == null)
+            if (id != null)
             {
-                return NotFound();
-            }
+                var viewModel = new MovieEditModel();
 
-            Movie movie = movieEditModel.Movie; 
+                Movie movie = movieEditModel.Movie;
 
-            movie = await _context.Movies
-                .Include(i => i.ListOfGenres)
-                    .ThenInclude(i => i.Genre)
-                .Include(i => i.ListOfStars)
-                    .ThenInclude(i => i.Star)
-                .Include(i => i.Director)
-                .FirstOrDefaultAsync(m => m.MovieId == id);
+                _context.Update(movie);
+                await _context.SaveChangesAsync();
 
-            if (await TryUpdateModelAsync<Movie>(movie))
-            {
-                UpdateMovie(selectedGenres, selectedStars, movie);
+                movie = await _context.Movies
+                    .Include(i => i.ListOfGenres)
+                        .ThenInclude(i => i.Genre)
+                    .Include(i => i.ListOfStars)
+                        .ThenInclude(i => i.Star)
+                    .Include(i => i.Director)
+                    .FirstOrDefaultAsync(m => m.MovieId == id);
 
-                string fileName = null;
-
-                if (movieEditModel.Image != null)
+                if (movie == null)
                 {
-                    string uploadFile = Path.Combine(_hostingEnvironment.WebRootPath, "images");
-                    fileName = Guid.NewGuid().ToString() + "_" + movieEditModel.Image.FileName;
-                    string filePath = Path.Combine(uploadFile, fileName);
-                    movieEditModel.Image.CopyTo(new FileStream(filePath, FileMode.Create));
-                    movie.Img = fileName;
+                    TempData["Message"] = errorMessage;
+                    return RedirectToAction(nameof(Index));
                 }
 
-                await _context.SaveChangesAsync();
-                
-                return RedirectToAction(nameof(Index));
+                if (await TryUpdateModelAsync<Movie>(movie))
+                {
+                    UpdateMovie(selectedGenres, selectedStars, movie);
+
+                    if (movieEditModel.Multimedia.Image != null)
+                    {
+                        movie.ImageUrl = movieEditModel.Multimedia.AddingImageUrl(movieEditModel.Multimedia.Image, _hostingEnvironment);
+                    }
+
+                    await _context.SaveChangesAsync();
+
+                    return RedirectToAction("Details", "Movie", new { id = movie.MovieId });
+                }
+
+
+                UpdateMovie(selectedGenres, selectedStars, movie);
+                FillGenresData(movie);
+                this.FillDropdown();
+
+                ViewModel model = new ViewModel();
+                model = model.fillMenuItems(_context, model);
+                viewModel.ListOfMovies = model.ListOfMovies;
+                viewModel.ListOfTVShows = model.ListOfTVShows;
+                viewModel.ListOfStars = model.ListOfStars;
+                viewModel.ListOfDirectors = model.ListOfDirectors;
+
+                return View(viewModel);
             }
-    
 
-            UpdateMovie(selectedGenres, selectedStars, movie);
-            FillGenresData(movie);
-            this.FillDropdown();
+            TempData["Message"] = errorMessage;
+            return RedirectToAction(nameof(Index));
 
-            return View(movie);
         }
 
 
         // GET: Movie/Delete/5
         public async Task<IActionResult> Delete(int? id)
         {
-            if (id == null)
+            if (id != null)
             {
-                return NotFound();
+                var movie = await _context.Movies
+                 .FirstOrDefaultAsync(m => m.MovieId == id);
+                if (movie == null)
+                {
+                    TempData["Message"] = errorMessage;
+                    return RedirectToAction(nameof(Index));
+                }
+
+                return View(movie);
             }
 
-            var movie = await _context.Movies
-                .FirstOrDefaultAsync(m => m.MovieId == id);
-            if (movie == null)
-            {
-                return NotFound();
-            }
+            TempData["Message"] = errorMessage;
+            return RedirectToAction(nameof(Index));
 
-            return View(movie);
+
         }
 
         // POST: Movie/Delete/5

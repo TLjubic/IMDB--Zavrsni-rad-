@@ -1,25 +1,19 @@
-﻿@model Kino.Models.Kino.ReviewDetailModel
+﻿@model Kino.Models.Kino.MovieModel.ReviewDetailMovieModel
 
 @{
     ViewData["Title"] = "Details";
-    var imgPath = "~/Images/" + (Model.Movie.Img ?? "banner1.svg"); 
+    var imgPath = "~/Images/" + (Model.Movie.ImageUrl ?? "NoImage.png");
 }
 
-<head>
-    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.css" />
-    <link rel="stylesheet" href="~/css/style.css" />
-    <link href='https://fonts.googleapis.com/css?family=Raleway:400,800,300' rel='stylesheet' type='text/css'>
-    <script src="https://kit.fontawesome.com/a076d05399.js"></script>
-</head>
+<div style="color: grey; font-size: 15px; font-weight: bold;">@TempData["Message"]</div>
 
-<ol class="breadcrumb">
+<ol class="breadcrumb" style="background-color: transparent;">
     <li><a asp-action="Index">Movies</a></li>
     <li class="active">Details</li>
 </ol>
 
+<div class="details-container">
 
-<div class="details-container"> 
-    
     <div class="details-title">
         @Html.DisplayFor(model => model.Movie.Title)
     </div>
@@ -34,7 +28,7 @@
                 @Html.DisplayNameFor(model => model.Movie.ReleaseDate)
             </dt>
             <dd>
-                @Html.DisplayFor(model => model.Movie.ReleaseDate)
+                @Model.Movie.ReleaseDate.ToLongDateString()
             </dd>
             <dt>
                 @Html.DisplayNameFor(model => model.Movie.Runtime)
@@ -48,7 +42,7 @@
             <dd>
                 @foreach (var genre in Model.Movie.ListOfGenres)
                 {
-                    @genre.Genre.Name @:
+                    <a asp-controller="Movie" asp-action="Search" asp-route-id="@genre.Genre.Name">@genre.Genre.Name</a>                   
                 }
             </dd>
             <dt>
@@ -70,19 +64,19 @@
     <div class="clear"></div>
 </div>
 <div class="details-cast">
-    
-    <h5>Cast</h5>
-    
-        @foreach (var star in Model.Movie.ListOfStars)
-        {
 
-            <div class="details-cast-img">
-                <a asp-controller="Star" asp-action="Details" asp-route-id="@star.StarId">
-                    <img src="~/images/@star.Star.Img">
-                    <h6>@star.Star.FullName</h6>
-                </a>
-            </div>
-        }
+    <h5>Cast</h5>
+
+    @foreach (var star in Model.Movie.ListOfStars)
+    {
+
+        <div class="details-cast-img">
+            <a asp-controller="Star" asp-action="Details" asp-route-id="@star.StarId">
+                <img src="~/images/@star.Star.ImageUrl">
+                <h6>@star.Star.FullName</h6>
+            </a>
+        </div>
+    }
 
 </div>
 <div class="clear"></div>
@@ -108,7 +102,7 @@
                     </div>
                     <div class="form-group">
                         <label asp-for="MovieReview.Body" class="control-label"></label>
-                        <textarea asp-for="MovieReview.Body" class="form-control" rows="5" ></textarea>
+                        <textarea asp-for="MovieReview.Body" class="form-control" rows="5"></textarea>
                         <span asp-validation-for="MovieReview.Body" class="text-danger"></span>
                     </div>
 
@@ -134,7 +128,7 @@
                         <h4>@item.Title</h4>
                         <p>@item.Body</p>
                     </div>
-                    
+
 
                 }
             }
@@ -152,3 +146,8 @@
     <a asp-action="Edit" asp-route-id="@Model.Movie.MovieId">Edit</a> |
     <a asp-action="Index">Back to List</a>
 </div>
+
+
+@section Scripts {
+    @await Html.PartialAsync("_ValidationScriptsPartial")
+}

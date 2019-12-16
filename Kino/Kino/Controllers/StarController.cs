@@ -9,12 +9,15 @@ using DAL;
 using Model;
 using Microsoft.AspNetCore.Hosting;
 using Kino.Models.Kino;
+using Kino.Models.Kino.StarModel;
 using System.IO;
 
 namespace Kino.Controllers
 {
     public class StarController : Controller
     {
+        public string errorMessage = "Star is not available!";
+
         private readonly KinoDb _context;
         private IHostingEnvironment _hostingEnvironment;
 
@@ -25,9 +28,14 @@ namespace Kino.Controllers
         }
 
         // GET: Star
-        public async Task<IActionResult> Index()
+        public async Task<IActionResult> Index(string sortOrder)
         {
-            var stars = await _context.Stars
+            var viewModel = new StarViewModel();
+
+            ViewData["NameSortParm"] = String.IsNullOrEmpty(sortOrder) ? "name_desc" : "";
+            ViewData["DateSortParm"] = sortOrder == "Date" ? "date_desc" : "Date";
+
+            viewModel.Stars = await _context.Stars
                 .Include(s => s.ListOfMovies)
                     .ThenInclude(s => s.Movie)
                 .Include(s => s.ListOfTVShows)
@@ -35,40 +43,69 @@ namespace Kino.Controllers
                 .AsNoTracking()
                 .ToListAsync();
 
-            return View(stars);
+            switch (sortOrder)
+            {
+                case "name_desc":
+                    viewModel.Stars = viewModel.Stars.OrderByDescending(s => s.FullName);
+                    break;
+                case "Date":
+                    viewModel.Stars = viewModel.Stars.OrderBy(s => s.Birth);
+                    break;
+                case "date_desc":
+                    viewModel.Stars = viewModel.Stars.OrderByDescending(s => s.Birth);
+                    break;
+                default:
+                    viewModel.Stars = viewModel.Stars.OrderBy(s => s.FullName);
+                    break;
+            }
+
+            MenuItems(viewModel);
+
+            return View(viewModel);
         }
 
         // GET: Star/Details/5
         public async Task<IActionResult> Details(int? id)
         {
-            if (id == null)
+            if (id != null)
             {
-                return NotFound();
+                var viewModel = new StarViewModel();
+
+                viewModel.Star = await _context.Stars
+                    .Include(s => s.ListOfMovies)
+                        .ThenInclude(s => s.Movie)
+                            .ThenInclude(s => s.ListOfGenres)
+                                .ThenInclude(s => s.Genre)
+                    .Include(s => s.ListOfTVShows)
+                        .ThenInclude(s => s.TVShow)
+                            .ThenInclude(s => s.ListOfGenres)
+                                .ThenInclude(s => s.Genre)
+                    .FirstOrDefaultAsync(m => m.StarId == id);
+
+                if (viewModel.Star == null)
+                {
+                    TempData["Message"] = errorMessage;
+                    return RedirectToAction(nameof(Index));
+                }
+
+                MenuItems(viewModel);
+
+                return View(viewModel);
             }
 
-            var star = await _context.Stars
-                .Include(s => s.ListOfMovies)
-                    .ThenInclude(s => s.Movie)
-                        .ThenInclude(s => s.ListOfGenres)
-                            .ThenInclude(s => s.Genre)
-                .Include(s => s.ListOfTVShows)
-                    .ThenInclude(s => s.TVShow)
-                        .ThenInclude(s => s.ListOfGenres)
-                            .ThenInclude(s => s.Genre)
-                .FirstOrDefaultAsync(m => m.StarId == id);
+            TempData["Message"] = errorMessage;
+            return RedirectToAction(nameof(Index));
 
-            if (star == null)
-            {
-                return NotFound();
-            }
-
-            return View(star);
         }
 
         // GET: Star/Create
         public IActionResult Create()
         {
-            return View();
+            var viewModel = new StarViewModel();
+
+            MenuItems(viewModel);
+
+            return View(viewModel);
         }
 
         // POST: Star/Create
@@ -76,45 +113,48 @@ namespace Kino.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create(StarViewModel starViewModel)
         {
-            Star star = starViewModel.Star;
-
+            
             if (ModelState.IsValid)
             {
-                string fileName = null;
 
-                if (starViewModel.Image != null)
+                Star star = starViewModel.Star;
+
+                if (starViewModel.Multimedia.Image != null)
                 {
-                    string uploadFile = Path.Combine(_hostingEnvironment.WebRootPath, "images");
-                    fileName = Guid.NewGuid().ToString() + "_" + starViewModel.Image.FileName;
-                    string filePath = Path.Combine(uploadFile, fileName);
-                    starViewModel.Image.CopyTo(new FileStream(filePath, FileMode.Create));
-                    star.Img = fileName;
+                    AddImage(star, starViewModel);
                 }
-
 
                 _context.Add(star);
                 await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
             }
+
+            MenuItems(starViewModel);
+
             return View(starViewModel);
         }
 
         // GET: Star/Edit/5
         public async Task<IActionResult> Edit(int? id)
         {
-            if (id == null)
+            if (id != null)
             {
-                return NotFound();
+                var viewModel = new StarViewModel();
+
+                MenuItems(viewModel);
+
+                viewModel.Star = await _context.Stars.FindAsync(id);
+                if (viewModel.Star == null)
+                {
+                    TempData["Message"] = errorMessage;
+                    return RedirectToAction(nameof(Index));
+                }
+                return View(viewModel);
             }
 
-            var viewModel = new StarViewModel();
+            TempData["Message"] = errorMessage;
+            return RedirectToAction(nameof(Index));
 
-            viewModel.Star = await _context.Stars.FindAsync(id);
-            if (viewModel.Star == null)
-            {
-                return NotFound();
-            }
-            return View(viewModel);
         }
 
         // POST: Star/Edit/5
@@ -124,22 +164,18 @@ namespace Kino.Controllers
         {
             if (id != starViewModel.Star.StarId)
             {
-                return NotFound();
+                TempData["Message"] = errorMessage;
+                return RedirectToAction(nameof(Index));
             }
-
-            Star star = starViewModel.Star;
 
             if (ModelState.IsValid)
             {
-                string fileName = null;
 
-                if (starViewModel.Image != null)
+                Star star = starViewModel.Star;
+
+                if (starViewModel.Multimedia.Image != null)
                 {
-                    string uploadFile = Path.Combine(_hostingEnvironment.WebRootPath, "images");
-                    fileName = Guid.NewGuid().ToString() + "_" + starViewModel.Image.FileName;
-                    string filePath = Path.Combine(uploadFile, fileName);
-                    starViewModel.Image.CopyTo(new FileStream(filePath, FileMode.Create));
-                    star.Img = fileName;
+                    AddImage(star, starViewModel);
                 }
 
                 try
@@ -151,34 +187,41 @@ namespace Kino.Controllers
                 {
                     if (!StarExists(star.StarId))
                     {
-                        return NotFound();
+                        TempData["Message"] = errorMessage;
+                        return RedirectToAction(nameof(Index));
                     }
                     else
                     {
                         throw;
                     }
                 }
-                return RedirectToAction(nameof(Index));
+                return RedirectToAction("Details", "Star", new { id = star.StarId });
             }
+
+            MenuItems(starViewModel);
+
             return View(starViewModel);
         }
 
         // GET: Star/Delete/5
         public async Task<IActionResult> Delete(int? id)
         {
-            if (id == null)
+            if (id != null)
             {
-                return NotFound();
-            }
-
-            var star = await _context.Stars
+                var star = await _context.Stars
                 .FirstOrDefaultAsync(m => m.StarId == id);
-            if (star == null)
-            {
-                return NotFound();
+                if (star == null)
+                {
+                    TempData["Message"] = errorMessage;
+                    return RedirectToAction(nameof(Index));
+                }
+
+                return View(star);
             }
 
-            return View(star);
+            TempData["Message"] = errorMessage;
+            return RedirectToAction(nameof(Index));
+
         }
 
         // POST: Star/Delete/5
@@ -196,5 +239,25 @@ namespace Kino.Controllers
         {
             return _context.Stars.Any(e => e.StarId == id);
         }
+
+
+        // Add Image
+        public void AddImage (Star star, StarViewModel starViewModel)
+        {
+            star.ImageUrl = starViewModel.Multimedia.AddingImageUrl(starViewModel.Multimedia.Image, _hostingEnvironment);
+        }
+
+
+        // Fill menu items
+        public void MenuItems (StarViewModel viewModel)
+        {
+            ViewModel model = new ViewModel();
+            model = model.fillMenuItems(_context, model);
+            viewModel.ListOfMovies = model.ListOfMovies;
+            viewModel.ListOfTVShows = model.ListOfTVShows;
+            viewModel.ListOfStars = model.ListOfStars;
+            viewModel.ListOfDirectors = model.ListOfDirectors;
+        }
+
     }
 }

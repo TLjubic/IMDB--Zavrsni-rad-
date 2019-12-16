@@ -1,18 +1,11 @@
-﻿@model Model.Director
+﻿@model Kino.Models.Kino.DirectorModel.DirectorViewModel
 
 @{
     ViewData["Title"] = "Details";
-    var imgPath = "~/Images/" + (Model.Img ?? "banner1.svg");
+    var imgPath = "~/Images/" + (Model.Director.ImageUrl ?? "NoImage.png");
 }
 
-<head>
-    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.css" />
-    <link rel="stylesheet" href="~/css/style.css" />
-    <link href='https://fonts.googleapis.com/css?family=Raleway:400,800,300' rel='stylesheet' type='text/css'>
-    <script src="https://kit.fontawesome.com/a076d05399.js"></script>
-</head>
-
-<ol class="breadcrumb">
+<ol class="breadcrumb" style="background-color: transparent;">
     <li><a asp-action="Index">Directors</a></li>
     <li class="active">Details</li>
 </ol>
@@ -21,7 +14,7 @@
 <div class="details-container">
 
     <div class="details-title">
-        @Html.DisplayFor(model => model.FullName)
+        @Html.DisplayFor(model => model.Director.FullName)
     </div>
 
     <div class="details-img">
@@ -31,34 +24,34 @@
     <div class="details-info">
         <dl class="dl-horizontal">
             <dt>
-                @Html.DisplayNameFor(model => model.Birth)
+                @Html.DisplayNameFor(model => model.Director.Birth)
             </dt>
             <dd>
-                @Html.DisplayFor(model => model.Birth)
+                @Model.Director.Birth.ToLongDateString()
             </dd>
             <dt>
-                @Html.DisplayNameFor(model => model.Description)
+                @Html.DisplayNameFor(model => model.Director.Description)
             </dt>
             <dd>
-                @Html.DisplayFor(model => model.Description)
+                @Html.DisplayFor(model => model.Director.Description)
             </dd>
         </dl>
     </div>
     <div class="clear"></div>
 </div>
 
-@if (Model.ListOfMovies.Count() > 0)
+@if (Model.Director.ListOfMovies.Count() > 0)
 {
     <div class="details-cast">
 
         <h5>Movies</h5>
 
-        @foreach (var movie in Model.ListOfMovies)
+        @foreach (var movie in Model.Director.ListOfMovies)
         {
 
             <div class="details-cast-img">
                 <a asp-controller="Movie" asp-action="Details" asp-route-id="@movie.MovieId">
-                    <img src="~/images/@movie.Img">
+                    <img src="~/images/@movie.ImageUrl">
                     <h6>@movie.Title</h6>
                 </a>
             </div>
@@ -68,6 +61,6 @@
 }
 
 <div>
-    <a asp-action="Edit" asp-route-id="@Model.DirectorId">Edit</a> |
+    <a asp-action="Edit" asp-route-id="@Model.Director.DirectorId">Edit</a> |
     <a asp-action="Index">Back to List</a>
 </div>

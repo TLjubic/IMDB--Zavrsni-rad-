@@ -1,18 +1,14 @@
-﻿@model Kino.Models.Kino.ReviewDetailModel
+﻿@model Kino.Models.Kino.TVShowModel.ReviewDetailTVShowModel
 
 @{
     ViewData["Title"] = "Details";
-    var imgPath = "~/Images/" + (Model.TVShow.Img ?? "banner1.svg");
+    var imgPath = "~/Images/" + (Model.TVShow.ImageUrl ?? "NoImage.png");
 }
 
-<head>
-    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.css" />
-    <link rel="stylesheet" href="~/css/style.css" />
-    <link href='https://fonts.googleapis.com/css?family=Raleway:400,800,300' rel='stylesheet' type='text/css'>
-    <script src="https://kit.fontawesome.com/a076d05399.js"></script>
-</head>
 
-<ol class="breadcrumb">
+<div style="color: grey; font-size: 15px; font-weight: bold;">@TempData["Message"]</div>
+
+<ol class="breadcrumb" style="background-color: transparent;">
     <li><a asp-action="Index">TV Shows</a></li>
     <li class="active">Details</li>
 </ol>
@@ -34,7 +30,7 @@
                 @Html.DisplayNameFor(model => model.TVShow.ReleaseDate)
             </dt>
             <dd>
-                @Html.DisplayFor(model => model.TVShow.ReleaseDate)
+                @Model.TVShow.ReleaseDate.ToLongDateString()
             </dd>
             <dt>
                 @Html.DisplayNameFor(model => model.TVShow.NumberOfEpisode)
@@ -48,7 +44,7 @@
             <dd>
                 @foreach (var genre in Model.TVShow.ListOfGenres)
                 {
-                    @genre.Genre.Name @:
+                    <a asp-controller="TVShow" asp-action="Search" asp-route-id="@genre.Genre.Name">@genre.Genre.Name</a>
                 }
             </dd>
             <dt>
@@ -70,7 +66,7 @@
 
         <div class="details-cast-img">
             <a asp-controller="Star" asp-action="Details" asp-route-id="@star.StarId">
-                <img src="~/images/@star.Star.Img">
+                <img src="~/images/@star.Star.ImageUrl">
                 <h6>@star.Star.FullName</h6>
             </a>
         </div>
@@ -119,12 +115,14 @@
                 @foreach (var item in Model.TVShow.ListOfReviews)
                 {
 
-                    <div>
-                        <span class="review-username">@item.Username</span>
-                        <span class="review-date">@item.Date.ToLongDateString()</span>
+                    <div class="one-review">
+                        <div>
+                            <span class="review-username">@item.Username</span>
+                            <span class="review-date">@item.Date.ToLongDateString()</span>
+                        </div>
+                        <h4>@item.Title</h4>
+                        <p>@item.Body</p>
                     </div>
-                    <h4>@item.Title</h4>
-                    <p>@item.Body</p>
 
                 }
             }
@@ -141,3 +139,9 @@
     <a asp-action="Edit" asp-route-id="@Model.TVShow.TVShowId">Edit</a> |
     <a asp-action="Index">Back to List</a>
 </div>
+
+
+
+@section Scripts {
+    @await Html.PartialAsync("_ValidationScriptsPartial")
+}
